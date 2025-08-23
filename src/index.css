@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Map container helper */
+.leaflet-container {
+  width: 100%;
+  height: 70vh;
+  border-radius: 0.5rem;
+}
