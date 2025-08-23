@@ -1,4 +1,4 @@
-import { useEvents } from "../utils/eventBus.js";
+import { useEvents } from "../utils/eventBus.jsx";
 
 export default function Alerts() {
   const { events } = useEvents();
