@@ -1,4 +1,4 @@
-import { useEvents } from "../utils/eventBus.js";
+import { useEvents } from "../utils/eventBus.jsx";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   BarChart, Bar
