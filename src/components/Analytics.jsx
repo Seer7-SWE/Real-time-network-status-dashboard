@@ -1,26 +1,21 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEvents } from "../utils/eventBus.js";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   BarChart, Bar
-} from 'recharts';
+} from "recharts";
 
 export default function Analytics() {
-  const [history, setHistory] = useState([]);
+  const { events } = useEvents();
 
-  useEffect(() => {
-    axios.get('/api/history')
-      .then(res => setHistory(res.data))
-      .catch(() => {
-        // fallback demo data
-        setHistory([
-          { date: '2025-08-20', outages: 3, severe: 1 },
-          { date: '2025-08-21', outages: 5, severe: 2 },
-          { date: '2025-08-22', outages: 2, severe: 0 },
-          { date: '2025-08-23', outages: 4, severe: 1 }
-        ]);
-      });
-  }, []);
+  // group by date
+  const history = events.reduce((acc, e) => {
+    const date = new Date(e.time).toISOString().slice(0, 10);
+    if (!acc[date]) acc[date] = { date, outages: 0, severe: 0 };
+    acc[date].outages++;
+    if (e.severity === "high") acc[date].severe++;
+    return acc;
+  }, {});
+  const chartData = Object.values(history);
 
   return (
     <div className="space-y-6">
@@ -29,7 +24,7 @@ export default function Analytics() {
         <div className="bg-white p-4 rounded shadow">
           <h3 className="font-semibold mb-2">Outages Over Time</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={history}>
+            <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis allowDecimals={false} />
@@ -43,7 +38,7 @@ export default function Analytics() {
         <div className="bg-white p-4 rounded shadow">
           <h3 className="font-semibold mb-2">Daily Outages</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={history}>
+            <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis allowDecimals={false} />
