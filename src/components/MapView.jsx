@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
@@ -8,6 +8,7 @@ import L from "leaflet";
 import { useEffect, useState } from "react";
 import { useEvents } from "../utils/eventBus.jsx";
 
+// Default marker fix (React-Leaflet + Vite)
 const DefaultIcon = new L.Icon({
   iconUrl: new URL("leaflet/dist/images/marker-icon.png", import.meta.url).toString(),
   iconRetinaUrl: new URL("leaflet/dist/images/marker-icon-2x.png", import.meta.url).toString(),
@@ -19,281 +20,149 @@ const DefaultIcon = new L.Icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+// Bahrain region centers
 const regions = {
-  "Manama": [26.2285, 50.5860],
+  Manama: [26.2285, 50.586],
   "Al Muharraq": [26.2572, 50.6119],
-  "Riffa": [26.1278, 50.5620],
+  Riffa: [26.1278, 50.562],
   "Isa Town": [26.1736, 50.5478],
-  "Sitra": [26.1547, 50.6206],
-  "Saar": [26.1970, 50.4820],
+  Sitra: [26.1547, 50.6206],
+  Saar: [26.197, 50.482],
   "Hamad Town": [26.1152, 50.50694],
-  "Jidhafs": [26.2186, 50.54778],
+  Jidhafs: [26.2186, 50.54778],
   "Al Hidd": [26.2455, 50.65417],
-  "Budaiya": [26.2241, 50.47083],
+  Budaiya: [26.2241, 50.47083],
   "Al Zallaq": [26.0461, 50.5072],
 };
 
+// Simple region polygons (demo)
 const regionPolygons = {
-  "Manama": [[26.2305, 50.5800], [26.2260, 50.5900], [26.2200, 50.5800]],
-  "Al Muharraq": [[26.2600, 50.6050], [26.2550, 50.6150], [26.2500, 50.6050]],
-  "Riffa": [[26.1300, 50.5550], [26.1250, 50.5650], [26.1200, 50.5550]],
-  "Isa Town": [[26.1750, 50.5420], [26.1700, 50.5520], [26.1650, 50.5420]],
-  "Sitra": [[26.1570, 50.6150], [26.1520, 50.6250], [26.1470, 50.6150]],
-  "Saar": [[26.1990, 50.4760], [26.1940, 50.4860], [26.1890, 50.4760]],
-  "Hamad Town": [[26.1180, 50.5010], [26.1130, 50.5110], [26.1080, 50.5010]],
-  "Jidhafs": [[26.2210, 50.5430], [26.2160, 50.5530], [26.2110, 50.5430]],
-  "Al Hidd": [[26.2480, 50.6490], [26.2430, 50.6590], [26.2380, 50.6490]],
-  "Budaiya": [[26.2260, 50.4650], [26.2210, 50.4750], [26.2160, 50.4650]],
-  "Al Zallaq": [[26.0490, 50.5020], [26.0440, 50.5120], [26.0390, 50.5020]],
+  Manama: [[26.2305, 50.58], [26.226, 50.59], [26.22, 50.58]],
+  "Al Muharraq": [[26.26, 50.605], [26.255, 50.615], [26.25, 50.605]],
+  Riffa: [[26.13, 50.555], [26.125, 50.565], [26.12, 50.555]],
 };
 
+// Metrics simulation
+function metricsFor(sev = "low") {
+  if (sev === "high") return { latency: 300 + Math.floor(Math.random() * 80), loss: 8 + Math.random() * 4 };
+  if (sev === "medium") return { latency: 150 + Math.floor(Math.random() * 50), loss: 3 + Math.random() * 2 };
+  return { latency: 60 + Math.floor(Math.random() * 20), loss: 0.5 + Math.random() * 1 };
+}
+
+// Overlay logic
 function MapOverlays({ events, mode }) {
   const map = useMap();
 
   useEffect(() => {
-    // Add region polygons once
-    const polygons = Object.entries(regionPolygons).map(([region, coords]) => {
-      const polygon = L.polygon(coords, { color: "blue" }).addTo(map);
-      polygon.on("click", () => {
+    if (!events || !events.length) return;
+    const layers = [];
+
+    // Region polygons (click → stats)
+    const polys = Object.entries(regionPolygons).map(([region, coords]) => {
+      const poly = L.polygon(coords, { color: "blue" }).addTo(map);
+      poly.on("click", () => {
         const regionEvents = events.filter(e => e.region === region);
         alert(`${region}: ${regionEvents.length} incidents\nLast: ${regionEvents.at(-1)?.type || "None"}`);
       });
-      return polygon;
+      return poly;
     });
+    layers.push(...polys);
 
-    return () => {
-      polygons.forEach(p => map.removeLayer(p));
-    };
-  }, [map, events]);
-
-  useEffect(() => {
-    if (!events.length) return;
-
-    // Clear existing layers before adding new ones
-    const existingLayers = [];
-
-    // MARKERS mode: render markers individually
-   // DEFAULT MARKERS MODE
-if (mode === "markers") {
-  events.forEach(evt => {
-    const latlng = regions[evt.region];
-    if (!latlng) return;
-
-    const marker = L.marker(latlng)
-      .bindPopup(
-        `<b>${evt.region}</b><br/>
-        ${evt.type} — ${evt.service || "N/A"}<br/>
-        Severity: ${evt.severity}`
-      )
-      .addTo(map);
-
-    existingLayers.push(marker);
-  });
-}
-
-// CLUSTERING MODE
-if (mode === "clustering") {
-  const markerCluster = L.markerClusterGroup();
-  events.forEach(evt => {
-    const latlng = regions[evt.region];
-    if (!latlng) return;
-
-    const marker = L.marker(latlng)
-      .bindPopup(
-        `<b>${evt.region}</b><br/>
-        ${evt.type} — ${evt.service || "N/A"}<br/>
-        Severity: ${evt.severity}`
-      );
-
-    markerCluster.addLayer(marker);
-  });
-
-  markerCluster.addTo(map);
-  existingLayers.push(markerCluster);
-}
-
-
-    // HEATMAP mode
-    if (mode === "heatmap") {
-      const heatPoints = events.map(evt => {
+    if (mode === "markers") {
+      events.forEach(evt => {
+        if (!evt?.region) return;
         const latlng = regions[evt.region];
-        if (!latlng) return null;
-        const intensity = evt.severity === "high" ? 1 : evt.severity === "medium" ? 0.6 : 0.3;
-        return [latlng[0], latlng[1], intensity];
-      }).filter(Boolean);
+        if (!latlng) return;
 
-      const heatLayer = L.heatLayer(heatPoints, { radius: 25, blur: 15 });
-      heatLayer.addTo(map);
-      existingLayers.push(heatLayer);
+        const sev = evt.severity || "low";
+        const metrics = metricsFor(sev);
+
+        const marker = L.marker(latlng).bindPopup(
+          `<b>${evt.region}</b><br/>
+           ${evt.type || "outage"} — ${evt.service || "N/A"}<br/>
+           Severity: ${sev} | Status: ${evt.status || "active"}<br/>
+           Latency: ${metrics.latency} ms • Loss: ${metrics.loss.toFixed(1)}%<br/>
+           ${new Date(evt.time || evt.startedAt || Date.now()).toLocaleString()}`
+        );
+        marker.addTo(map);
+        layers.push(marker);
+      });
     }
 
-    // Cleanup layers on unmount or mode change
+    if (mode === "clustering") {
+      const cluster = L.markerClusterGroup();
+      events.forEach(evt => {
+        if (!evt?.region) return;
+        const latlng = regions[evt.region];
+        if (!latlng) return;
+        const marker = L.marker(latlng).bindPopup(
+          `<b>${evt.region}</b><br/>
+           ${evt.type || "outage"} — ${evt.service || "N/A"}<br/>
+           Severity: ${evt.severity || "low"}`
+        );
+        cluster.addLayer(marker);
+      });
+      cluster.addTo(map);
+      layers.push(cluster);
+    }
+
+    if (mode === "heatmap") {
+      const heatPoints = events
+        .map(evt => {
+          if (!evt?.region) return null;
+          const latlng = regions[evt.region];
+          if (!latlng) return null;
+          const weight = evt.severity === "high" ? 1 : evt.severity === "medium" ? 0.6 : 0.3;
+          return [latlng[0], latlng[1], weight];
+        })
+        .filter(Boolean);
+      const heat = L.heatLayer(heatPoints, { radius: 25, blur: 15 });
+      heat.addTo(map);
+      layers.push(heat);
+    }
+
     return () => {
-      existingLayers.forEach(layer => map.removeLayer(layer));
+      layers.forEach(l => map.removeLayer(l));
     };
   }, [map, events, mode]);
 
   return null;
 }
 
-function metricsFor(sev = "low") {
-  if (sev === "high")   return { latency: 300 + Math.floor(Math.random() * 80), loss: 8 + Math.random() * 4 };
-  if (sev === "medium") return { latency: 150 + Math.floor(Math.random() * 50), loss: 3 + Math.random() * 2 };
-  return { latency: 60 + Math.floor(Math.random() * 20), loss: 0.5 + Math.random() * 1 };
-}
-
-// when creating the marker:
-const m = metricsFor(event.severity);
-marker.bindPopup(`
-  <b>${event.region}</b><br/>
-  ${event.type} — ${event.service}<br/>
-  Severity: ${event.severity} | Status: ${event.status}<br/>
-  Latency: ${event.latency} ms • Packet Loss: ${event.loss.toFixed(1)}%<br/>
-  ${new Date(inc.startedAt).toLocaleString()}
-`);
-
-
-
-
+// MAIN component
 export default function MapView() {
-  const { events, incidents, REGION_META } = useEvents();
-  const [mode, setMode] = useState("markers"); // Default mode
-  
-  const mapRef = useRef(null);
-  const markersRef = useRef(null);
-  const heatRef = useRef(null);
-
-  useEffect(() => {
-    // INIT MAP ONCE
-    if (!mapRef.current) {
-      mapRef.current = L.map("map").setView([26.2285, 50.5860], 11);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(mapRef.current);
-    }
-
-    const map = mapRef.current;
-
-    // Choose a source: incidents preferred, fallback to events
-    const items = (incidents && incidents.length > 0) ? incidents : (events || []);
-
-    // CLEAR previous layers
-    if (markersRef.current) {
-      map.removeLayer(markersRef.current);
-    }
-    if (heatRef.current) {
-      map.removeLayer(heatRef.current);
-    }
-
-    // CLUSTER MARKERS
-    markersRef.current = L.markerClusterGroup();
-
-    items.forEach((raw) => {
-      if (!raw) return; // guard
-      const regionMeta = raw.region ? REGION_META[raw.region] : null;
-
-      // Resolve coords safely (from item or region meta)
-      const lat = (typeof raw.lat === "number") ? raw.lat : (regionMeta?.lat ?? null);
-      const lng = (typeof raw.lng === "number") ? raw.lng : (regionMeta?.lng ?? null);
-      if (typeof lat !== "number" || typeof lng !== "number") return;
-
-      // Safe fields with fallbacks
-      const sev = raw.severity || "low";
-      const typ = raw.type || "outage";
-      const svc = raw.service || "Mobile Data";
-      const status = raw.status || "active";
-      const region = raw.region || "Unknown";
-      const timeISO = raw.time || raw.startedAt || new Date().toISOString();
-
-      const m = metricsFor(sev);
-
-      const marker = L
-        .marker([lat, lng])
-        .bindPopup(
-          `<b>${region}</b><br/>
-           ${typ} — ${svc}<br/>
-           Severity: ${sev} | Status: ${status}<br/>
-           Latency: ${m.latency} ms • Packet Loss: ${m.loss.toFixed(1)}%<br/>
-           ${new Date(timeISO).toLocaleString()}`
-        );
-
-      markersRef.current.addLayer(marker);
-    });
-
-    markersRef.current.addTo(map);
-
-    // HEATMAP (optional)
-    const heatPoints = items
-      .map((raw) => {
-        if (!raw) return null;
-        const regionMeta = raw.region ? REGION_META[raw.region] : null;
-        const lat = (typeof raw.lat === "number") ? raw.lat : (regionMeta?.lat ?? null);
-        const lng = (typeof raw.lng === "number") ? raw.lng : (regionMeta?.lng ?? null);
-        if (typeof lat !== "number" || typeof lng !== "number") return null;
-        const sev = raw?.severity || "low";
-        const weight = sev === "high" ? 1 : sev === "medium" ? 0.6 : 0.3;
-        return [lat, lng, weight];
-      })
-      .filter(Boolean);
-
-    heatRef.current = L.heatLayer(heatPoints, { radius: 25, blur: 15 });
-    heatRef.current.addTo(map);
-
-    // CLEANUP for next render
-    return () => {
-      if (markersRef.current) map.removeLayer(markersRef.current);
-      if (heatRef.current) map.removeLayer(heatRef.current);
-    };
-  }, [events, incidents, REGION_META]);
-
+  const { events } = useEvents();
+  const [mode, setMode] = useState("markers");
 
   return (
     <div className="h-[400px] md:h-[500px] w-full rounded shadow bg-white dark:bg-gray-800 p-4 flex flex-col">
       <h2 className="font-semibold mb-2">Live Network Map</h2>
 
-      {/* Mode toggle buttons */}
       <div className="mb-4 space-x-2">
         <button
-          className={`px-3 py-1 rounded ${
-            mode === "markers" ? "bg-blue-600 text-white" : "bg-gray-200"
-          }`}
+          className={`px-3 py-1 rounded ${mode === "markers" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
           onClick={() => setMode("markers")}
         >
           Markers
         </button>
         <button
-          className={`px-3 py-1 rounded ${
-            mode === "clustering" ? "bg-blue-600 text-white" : "bg-gray-200"
-          }`}
+          className={`px-3 py-1 rounded ${mode === "clustering" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
           onClick={() => setMode("clustering")}
         >
           Clustering
         </button>
         <button
-          className={`px-3 py-1 rounded ${
-            mode === "heatmap" ? "bg-blue-600 text-white" : "bg-gray-200"
-          }`}
+          className={`px-3 py-1 rounded ${mode === "heatmap" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
           onClick={() => setMode("heatmap")}
         >
           Heatmap
         </button>
       </div>
 
-      {/* Map Container */}
-      <MapContainer
-        center={[26.2285, 50.586]}
-        zoom={10}
-        scrollWheelZoom
-        className="flex-1 rounded z-0"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/">OSM</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <MapOverlays events={events} mode={mode} />
+      <MapContainer center={[26.2285, 50.586]} zoom={11} scrollWheelZoom className="flex-1 rounded z-0">
+        <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <MapOverlays events={events || []} mode={mode} />
       </MapContainer>
     </div>
-  
-
   );
 }
