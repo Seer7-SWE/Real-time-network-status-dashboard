@@ -142,19 +142,15 @@ function metricsFor(sev) {
   return { latency: 60 + Math.floor(Math.random()*20), loss: 0.5 + Math.random()*1 };
 }
 
-// when binding popup for each event/marker:
-const m = metricsFor(evt.severity);
-const marker = L.marker([evt.lat, evt.lng])
-  .bindPopup(
-    `<b>${evt.region}</b><br/>
-     ${evt.type} — ${evt.service}<br/>
-     Severity: ${evt.severity} | Status: ${evt.status}<br/>
-     Latency: ${m.latency} ms • Packet Loss: ${m.loss.toFixed(1)}%<br/>
-     ${new Date(evt.time).toLocaleString()}`
-  )
-  .addTo(map);
-
-existingLayers.push(marker);
+// when creating the marker:
+const m = metricsFor(inc.severity);
+marker.bindPopup(`
+  <b>${inc.region}</b><br/>
+  ${inc.type} — ${inc.service}<br/>
+  Severity: ${inc.severity} | Status: ${inc.status}<br/>
+  Latency: ${m.latency} ms • Packet Loss: ${m.loss.toFixed(1)}%<br/>
+  ${new Date(inc.startedAt).toLocaleString()}
+`);
 
 
 
