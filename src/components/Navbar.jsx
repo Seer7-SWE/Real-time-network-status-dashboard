@@ -1,6 +1,6 @@
 export default function Navbar({ setView }) {
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <nav className="bg-blue-600 dark:bg-blue-900 text-white p-4 flex justify-between items-center">
       <h1 className="text-lg font-bold">Network Status Dashboard</h1>
       <div className="space-x-4 flex items-center">
         <button onClick={() => setView("dashboard")}>Dashboard</button>
