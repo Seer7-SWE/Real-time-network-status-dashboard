@@ -123,6 +123,24 @@ function MapOverlays({ events, mode }) {
   return null;
 }
 
+function metricsFor(sev) {
+  if (sev === "high")   return { latency: 300 + Math.floor(Math.random()*80), loss: 8 + Math.random()*4 };
+  if (sev === "medium") return { latency: 150 + Math.floor(Math.random()*50), loss: 3 + Math.random()*2 };
+  return { latency: 60 + Math.floor(Math.random()*20), loss: 0.5 + Math.random()*1 };
+}
+
+// when binding popup for each event/marker:
+const m = metricsFor(evt.severity);
+.bindPopup(
+  `<b>${evt.region}</b><br/>
+   ${evt.type} — ${evt.service}<br/>
+   Severity: ${evt.severity} | Status: ${evt.status}<br/>
+   Latency: ${m.latency} ms • Packet Loss: ${m.loss.toFixed(1)}%<br/>
+   ${new Date(evt.time).toLocaleString()}`
+);
+
+
+
 export default function MapView() {
   const { events } = useEvents();
   const [mode, setMode] = useState("markers"); // Default mode
