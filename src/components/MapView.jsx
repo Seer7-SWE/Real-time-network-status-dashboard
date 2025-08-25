@@ -136,10 +136,10 @@ if (mode === "clustering") {
   return null;
 }
 
-function metricsFor(sev) {
-  if (sev === "high")   return { latency: 300 + Math.floor(Math.random()*80), loss: 8 + Math.random()*4 };
-  if (sev === "medium") return { latency: 150 + Math.floor(Math.random()*50), loss: 3 + Math.random()*2 };
-  return { latency: 60 + Math.floor(Math.random()*20), loss: 0.5 + Math.random()*1 };
+function metricsFor(sev = "low") {
+  if (sev === "high")   return { latency: 300 + Math.floor(Math.random() * 80), loss: 8 + Math.random() * 4 };
+  if (sev === "medium") return { latency: 150 + Math.floor(Math.random() * 50), loss: 3 + Math.random() * 2 };
+  return { latency: 60 + Math.floor(Math.random() * 20), loss: 0.5 + Math.random() * 1 };
 }
 
 // when creating the marker:
@@ -156,8 +156,96 @@ marker.bindPopup(`
 
 
 export default function MapView() {
-  const { events } = useEvents();
+  const { events, incidents, REGION_META } = useEvents();
   const [mode, setMode] = useState("markers"); // Default mode
+  
+  const mapRef = useRef(null);
+  const markersRef = useRef(null);
+  const heatRef = useRef(null);
+
+  useEffect(() => {
+    // INIT MAP ONCE
+    if (!mapRef.current) {
+      mapRef.current = L.map("map").setView([26.2285, 50.5860], 11);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(mapRef.current);
+    }
+
+    const map = mapRef.current;
+
+    // Choose a source: incidents preferred, fallback to events
+    const items = (incidents && incidents.length > 0) ? incidents : (events || []);
+
+    // CLEAR previous layers
+    if (markersRef.current) {
+      map.removeLayer(markersRef.current);
+    }
+    if (heatRef.current) {
+      map.removeLayer(heatRef.current);
+    }
+
+    // CLUSTER MARKERS
+    markersRef.current = L.markerClusterGroup();
+
+    items.forEach((raw) => {
+      if (!raw) return; // guard
+      const regionMeta = raw.region ? REGION_META[raw.region] : null;
+
+      // Resolve coords safely (from item or region meta)
+      const lat = (typeof raw.lat === "number") ? raw.lat : (regionMeta?.lat ?? null);
+      const lng = (typeof raw.lng === "number") ? raw.lng : (regionMeta?.lng ?? null);
+      if (typeof lat !== "number" || typeof lng !== "number") return;
+
+      // Safe fields with fallbacks
+      const sev = raw.severity || "low";
+      const typ = raw.type || "outage";
+      const svc = raw.service || "Mobile Data";
+      const status = raw.status || "active";
+      const region = raw.region || "Unknown";
+      const timeISO = raw.time || raw.startedAt || new Date().toISOString();
+
+      const m = metricsFor(sev);
+
+      const marker = L
+        .marker([lat, lng])
+        .bindPopup(
+          `<b>${region}</b><br/>
+           ${typ} — ${svc}<br/>
+           Severity: ${sev} | Status: ${status}<br/>
+           Latency: ${m.latency} ms • Packet Loss: ${m.loss.toFixed(1)}%<br/>
+           ${new Date(timeISO).toLocaleString()}`
+        );
+
+      markersRef.current.addLayer(marker);
+    });
+
+    markersRef.current.addTo(map);
+
+    // HEATMAP (optional)
+    const heatPoints = items
+      .map((raw) => {
+        if (!raw) return null;
+        const regionMeta = raw.region ? REGION_META[raw.region] : null;
+        const lat = (typeof raw.lat === "number") ? raw.lat : (regionMeta?.lat ?? null);
+        const lng = (typeof raw.lng === "number") ? raw.lng : (regionMeta?.lng ?? null);
+        if (typeof lat !== "number" || typeof lng !== "number") return null;
+        const sev = raw?.severity || "low";
+        const weight = sev === "high" ? 1 : sev === "medium" ? 0.6 : 0.3;
+        return [lat, lng, weight];
+      })
+      .filter(Boolean);
+
+    heatRef.current = L.heatLayer(heatPoints, { radius: 25, blur: 15 });
+    heatRef.current.addTo(map);
+
+    // CLEANUP for next render
+    return () => {
+      if (markersRef.current) map.removeLayer(markersRef.current);
+      if (heatRef.current) map.removeLayer(heatRef.current);
+    };
+  }, [events, incidents, REGION_META]);
+
 
   return (
     <div className="h-[400px] md:h-[500px] w-full rounded shadow bg-white dark:bg-gray-800 p-4 flex flex-col">
