@@ -8,7 +8,7 @@ import { EventProvider } from "./utils/eventBus.jsx";
 import { FilterProvider } from "./utils/filterContext.jsx";
 import Home from "./components/Home.jsx";
 import Login from "./components/Login.jsx";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEvents } from "./utils/eventBus.jsx";
 import { useSession } from "./utils/auth.js";
