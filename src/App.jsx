@@ -43,7 +43,9 @@ export default function App() {
            <Alerts />
           <Analytics />
         </div>
+          
             <div className="p-4 space-y-4 bg-gray-100 min-h-screen">
+              <RegionHealth>
           {/* Map */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="col-span-1 md:col-span-2 lg:col-span-2">
@@ -56,7 +58,7 @@ export default function App() {
           <RegionHealth />
 
           {/* Analytics */}
-          <Analytics />
+          
         </div>
       </FilterProvider>
     </EventProvider>
