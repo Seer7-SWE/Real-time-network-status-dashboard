@@ -7,9 +7,9 @@ export default function Alerts() {
   const alerts = [...events].reverse(); // latest first
 
   // --- filter state ---
-  const [region, setRegion] = useState("");
+  /*const [region, setRegion] = useState("");
   const [severity, setSeverity] = useState("");
-  const [type, setType] = useState("");
+  const [type, setType] = useState("");*/
   const { region, setRegion, severity, setSeverity, type, setType, resetFilters } = useFilters();
 
   // --- filtering logic ---
