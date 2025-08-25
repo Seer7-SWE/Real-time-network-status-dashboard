@@ -18,19 +18,15 @@ export default function App() {
 
           {view === "dashboard" && (
             <>
-              {/* Wrap map and alerts in their own container */}
-              <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
-                <div className="relative flex items-stretch">
-                  <MapView className="flex-1" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
+                <div className="relative z-10">
+                  <MapView />
                 </div>
-                <Alerts className="flex-1" />
+                <Alerts />
               </div>
 
-              {/* Region health cards */}
-              <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-4">
                 <RegionHealth />
-                <RegionHealth />
-                {/* Add more RegionHealth as needed */}
               </div>
             </>
           )}
