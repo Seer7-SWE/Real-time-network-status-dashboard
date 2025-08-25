@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useEvents } from "../utils/eventBus.jsx";
+import { useFilters } from "../utils/filterContext.jsx";
 
 export default function Alerts() {
   const { events } = useEvents();
@@ -9,6 +10,7 @@ export default function Alerts() {
   const [region, setRegion] = useState("");
   const [severity, setSeverity] = useState("");
   const [type, setType] = useState("");
+  const { region, setRegion, severity, setSeverity, type, setType, resetFilters } = useFilters();
 
   // --- filtering logic ---
   const filteredAlerts = alerts.filter((a) => {
@@ -72,6 +74,7 @@ export default function Alerts() {
             setSeverity("");
             setType("");
           }}
+          <button onClick={resetFilters}>
           className="ml-auto bg-gray-100 hover:bg-gray-200 text-sm px-3 py-1 rounded"
         >
           Reset
