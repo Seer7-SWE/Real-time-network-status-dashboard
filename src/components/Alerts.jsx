@@ -1,4 +1,6 @@
 // src/components/Alerts.jsx
+import { useEffect, useRef } from "react";
+import { toast } from "react-toastify";
 import { useFilters } from "../utils/filterContext.jsx";
 import { useEvents } from "../utils/eventBus.jsx";
 
@@ -60,6 +62,7 @@ export default function Alerts() {
           <li className="text-sm text-gray-500">No alerts found.</li>
         )}
       </ul>
+      <ToastContainer position="top-right" autoClose={4000} newestOnTop closeOnClick pauseOnHover />
     </div>
   );
 }
