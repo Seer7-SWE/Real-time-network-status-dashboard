@@ -25,7 +25,7 @@ export default function Alerts() {
   const regions = [...new Set(events.map((e) => e.region))];
 
   return (
-    <div className="bg-white rounded shadow p-3 h-full flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded shadow p-4 dark:text-gray-100">
       <h2 className="font-semibold mb-2">Live Alerts</h2>
 
       {/* Filters */}
