@@ -12,7 +12,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEvents } from "./utils/eventBus.jsx";
 import { useSession } from "./utils/auth.js";
+import "./index.css";
 
+// Global network status banner
 function GlobalBanner() {
   const { incidents } = useEvents();
   const active = incidents.filter(i => i.status === "active");
@@ -29,11 +31,12 @@ function GlobalBanner() {
   );
 }
 
+// KPI Cards section
 function KpiCards() {
   const { incidents, calcMTTRMinutes, calcUptimePercent } = useEvents();
-  const mttr = calcMTTRMinutes();           // all regions
-  const uptime = calcUptimePercent();       // all regions
-  const weekIncidents = incidents.filter(i => (Date.now() - new Date(i.startedAt)) < 7*24*3600*1000).length;
+  const mttr = calcMTTRMinutes();
+  const uptime = calcUptimePercent();
+  const weekIncidents = incidents.filter(i => (Date.now() - new Date(i.startedAt)) < 7 * 24 * 3600 * 1000).length;
 
   return (
     <div className="grid sm:grid-cols-3 gap-4">
@@ -53,34 +56,41 @@ function KpiCards() {
   );
 }
 
-
+// Main App Component
 export default function App() {
   const [view, setView] = useState("dashboard");
-  const [page, setPage] = useState("home"); // "home" | "login" | "dashboard"
+  const [page, setPage] = useState("home");
+  const session = useSession();
 
   if (page === "home") return <Home onLoginClick={() => setPage("login")} />;
   if (page === "login") return <Login onLoginSuccess={() => setPage("dashboard")} />;
+  if (!session) return <Home onLoginClick={() => setPage("login")} />;
 
-  
   return (
     <EventProvider>
       <FilterProvider>
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-gray-100 flex flex-col">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-gray-100 flex flex-col font-sans">
           <Navbar setView={setView} />
 
           {view === "dashboard" && (
             <>
+              {/* Optional: Global status banner */}
+              <div className="p-4">
+                <GlobalBanner />
+              </div>
+
+              {/* Optional: KPI cards */}
+              <div className="p-4">
+                <KpiCards />
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
-                {/* Map container with overflow hidden */}
                 <div className="relative z-10 overflow-hidden">
                   <MapView />
                 </div>
-
-                {/* Alerts panel */}
                 <Alerts />
               </div>
 
-              {/* Region cards with higher stacking */}
               <div className="p-4 relative z-20">
                 <RegionHealth />
               </div>
@@ -93,6 +103,7 @@ export default function App() {
             </div>
           )}
         </div>
+
         <ToastContainer position="top-right" autoClose={4000} newestOnTop closeOnClick pauseOnHover />
       </FilterProvider>
     </EventProvider>
