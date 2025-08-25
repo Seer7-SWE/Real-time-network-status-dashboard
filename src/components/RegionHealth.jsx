@@ -3,11 +3,16 @@ import { useFilters } from "../utils/filterContext.jsx";
 
 const regionsList = [
   "Manama",
-  "Muharraq",
+  "Al Muharraq",
   "Riffa",
   "Isa Town",
   "Sitra",
   "Saar",
+  "Hamad Town",
+  "Jidhafs",
+  "Al Hidd",
+  "Budaiya",
+  "Al Zallaq",
 ];
 
 function getStatus(events) {
@@ -56,15 +61,11 @@ export default function RegionHealth() {
         return (
           <div
             key={r}
-            className="bg-white rounded shadow p-4 flex flex-col"
-          >
-          <div
-             key={r}
             onClick={() => setRegion(r)}
             className={`bg-white rounded shadow p-4 flex flex-col cursor-pointer transition 
               ${region === r ? "ring-2 ring-blue-500" : "hover:bg-gray-50"}`}
           >
-           <h3 className="font-semibold text-lg mb-1">{r}</h3>
+            <h3 className="font-semibold text-lg mb-1">{r}</h3>
             <p className="text-sm mb-1">
               <span className="font-medium">Status:</span>{" "}
               <span
@@ -92,6 +93,5 @@ export default function RegionHealth() {
         );
       })}
     </div>
-);
-    
-
+  );
+}
