@@ -29,6 +29,7 @@ function getUptime(events, totalEvents) {
 export default function RegionHealth() {
   const { events } = useEvents();
   const { region, severity, type } = useFilters();
+  const { region, setRegion, severity, type } = useFilters();
 
   // Apply global filters (but ignore region filter — we show all regions)
   const filteredEvents = events.filter((a) => {
@@ -58,7 +59,13 @@ export default function RegionHealth() {
             key={r}
             className="bg-white rounded shadow p-4 flex flex-col"
           >
-            <h3 className="font-semibold text-lg mb-1">{r}</h3>
+          <div
+             key={r}
+            onClick={() => setRegion(r)}
+            className={`bg-white rounded shadow p-4 flex flex-col cursor-pointer transition 
+              ${region === r ? "ring-2 ring-blue-500" : "hover:bg-gray-50"}`}
+          >
+           <h3 className="font-semibold text-lg mb-1">{r}</h3>
             <p className="text-sm mb-1">
               <span className="font-medium">Status:</span>{" "}
               <span
