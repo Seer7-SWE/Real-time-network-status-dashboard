@@ -14,10 +14,10 @@ export default function App() {
     <EventProvider>
       <FilterProvider>
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-gray-100"
-          {/* Navbar */}
+          
           <Navbar setView={setView} />
 
-          {/* Dashboard View */}
+          
           {view === "dashboard" && (
             <div className="p-4 space-y-4">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -25,12 +25,12 @@ export default function App() {
                 <Alerts />
               </div>
 
-              {/* Region Health Cards */}
+              
               <RegionHealth />
             </div>
           )}
 
-          {/* Analytics View */}
+          
           {view === "analytics" && (
             <div className="p-4">
               <Analytics />
