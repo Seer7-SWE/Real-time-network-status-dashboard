@@ -62,7 +62,7 @@ export default function RegionHealth() {
           <div
             key={r}
             onClick={() => setRegion(r)}
-            className={`bg-white rounded shadow p-4 flex flex-col cursor-pointer transition 
+            className={`bg-white dark:bg-gray-800 rounded shadow p-4 flex flex-col cursor-pointer transition
               ${region === r ? "ring-2 ring-blue-500" : "hover:bg-gray-50"}`}
           >
             <h3 className="font-semibold text-lg mb-1">{r}</h3>
