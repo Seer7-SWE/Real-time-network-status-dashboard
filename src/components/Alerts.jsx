@@ -25,7 +25,7 @@ export default function Alerts() {
         <select
           value={region}
           onChange={(e) => setRegion(e.target.value)}
-          className="border rounded px-2 py-1 text-sm"
+          className="border rounded px-2 py-1 text-sm-black:text-sm-white"
         >
           <option value="">All Regions</option>
           {regions.map((r) => (
@@ -38,7 +38,7 @@ export default function Alerts() {
         <select
           value={severity}
           onChange={(e) => setSeverity(e.target.value)}
-          className="border rounded px-2 py-1 text-sm"
+          className="border rounded px-2 py-1 text-sm-black:text-sm-white"
         >
           <option value="">All Severities</option>
           <option value="low">Low</option>
@@ -49,7 +49,7 @@ export default function Alerts() {
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="border rounded px-2 py-1 text-sm"
+          className="border rounded px-2 py-1 text-sm-black:text-sm-white"
         >
           <option value="">All Types</option>
           <option value="outage">Outage</option>
