@@ -1,4 +1,5 @@
 import { useEvents } from "../utils/eventBus.jsx";
+import { useFilters } from "../utils/filterContext.jsx";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   BarChart, Bar
@@ -6,6 +7,7 @@ import {
 
 export default function Analytics() {
   const { events } = useEvents();
+  const { region, severity, type } = useFilters();
 
   // group by date
   const history = events.reduce((acc, e) => {
@@ -16,6 +18,15 @@ export default function Analytics() {
     return acc;
   }, {});
   const chartData = Object.values(history);
+
+  const filteredEvents = events;
+  const filteredEvents = events.filter((a) => {
+    return (
+      (region ? a.region === region : true) &&
+      (severity ? a.severity === severity : true) &&
+      ( type ? a.type === type : true)
+    );
+  });
 
   return (
     <div className="space-y-6">
