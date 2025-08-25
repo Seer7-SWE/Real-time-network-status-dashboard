@@ -19,13 +19,17 @@ export default function App() {
           {view === "dashboard" && (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
-                <div className="relative z-10">
+                {/* Map container with overflow hidden */}
+                <div className="relative z-10 overflow-hidden">
                   <MapView />
                 </div>
+
+                {/* Alerts panel */}
                 <Alerts />
               </div>
 
-              <div className="p-4">
+              {/* Region cards with higher stacking */}
+              <div className="p-4 relative z-20">
                 <RegionHealth />
               </div>
             </>
