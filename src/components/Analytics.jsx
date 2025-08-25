@@ -19,7 +19,7 @@ export default function Analytics() {
   }, {});
   const chartData = Object.values(history);
 
-  const filteredEvents = events;
+  
   const filteredEvents = events.filter((a) => {
     return (
       (region ? a.region === region : true) &&
