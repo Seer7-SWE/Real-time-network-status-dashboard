@@ -9,7 +9,12 @@ import { FilterProvider } from "./utils/filterContext.jsx";
 
 export default function App() {
   const [view, setView] = useState("dashboard");
+  const [page, setPage] = useState("home"); // "home" | "login" | "dashboard"
 
+  if (page === "home") return <Home onLoginClick={() => setPage("login")} />;
+  if (page === "login") return <Login onLoginSuccess={() => setPage("dashboard")} />;
+
+  
   return (
     <EventProvider>
       <FilterProvider>
