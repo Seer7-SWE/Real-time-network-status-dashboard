@@ -1,5 +1,6 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster";
 import L from "leaflet";
 import { useEvents } from "../utils/eventBus.jsx";
 
@@ -16,6 +17,20 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function MapView() {
   const { events } = useEvents();
+
+  const markers = L.markerClusterGroup();
+
+events.forEach(evt => {
+  const latlng = regions[evt.region];
+  if (latlng) {
+    const marker = L.marker(latlng).bindPopup(
+      `<b>${evt.region}</b><br>Status: ${evt.type}<br>Severity: ${evt.severity}`
+    );
+    markers.addLayer(marker);
+  }
+});
+
+map.addLayer(markers);
 
   return (
     <div id="map" className="h-[400px] md:h-[500px] w-full rounded shadow bg-white dark:bg-gray-800 p-4">
