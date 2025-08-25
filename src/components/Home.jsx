@@ -13,10 +13,7 @@ export default function Home({ onLoginClick }) {
         🔑 Admin Login
       </button>
     </div>
-    <div className="p-4 space-y-4">
-      <GlobalBanner />
-      <KpiCards />
-   </div>
+    
 
   );
 }
