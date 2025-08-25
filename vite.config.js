@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import express from 'express';
 import { Server as SocketIOServer } from 'socket.io';
-import reactToastify from 'react-toastify';
+
 
 // Simple in-memory store
 const events = []; // raw events list
@@ -85,10 +85,5 @@ const backendPlugin = () => ({
 
 export default defineConfig({
   plugins: [react(), backendPlugin()],
-  server: { port: 5173 },
-  build: {
-    rollupOptions: {
-      external: [reactToastify],
-    }
-  }
+  server: { port: 5173 }
 });
