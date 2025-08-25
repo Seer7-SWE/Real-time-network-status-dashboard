@@ -144,13 +144,18 @@ function metricsFor(sev) {
 
 // when binding popup for each event/marker:
 const m = metricsFor(evt.severity);
-.bindPopup(
-  `<b>${evt.region}</b><br/>
-   ${evt.type} — ${evt.service}<br/>
-   Severity: ${evt.severity} | Status: ${evt.status}<br/>
-   Latency: ${m.latency} ms • Packet Loss: ${m.loss.toFixed(1)}%<br/>
-   ${new Date(evt.time).toLocaleString()}`
-);
+const marker = L.marker([evt.lat, evt.lng])
+  .bindPopup(
+    `<b>${evt.region}</b><br/>
+     ${evt.type} — ${evt.service}<br/>
+     Severity: ${evt.severity} | Status: ${evt.status}<br/>
+     Latency: ${m.latency} ms • Packet Loss: ${m.loss.toFixed(1)}%<br/>
+     ${new Date(evt.time).toLocaleString()}`
+  )
+  .addTo(map);
+
+existingLayers.push(marker);
+
 
 
 
