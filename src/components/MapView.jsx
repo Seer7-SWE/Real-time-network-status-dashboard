@@ -18,7 +18,7 @@ export default function MapView() {
   const { events } = useEvents();
 
   return (
-    <div className="h-96 w-full rounded shadow bg-gray-200 dark:bg-gray-700">
+    <div id="map" className="h-[400px] md:h-[500px] w-full rounded shadow">
       <h2 className="font-semibold mb-2">Live Network Map</h2>
       <MapContainer center={[26.2285, 50.586]} zoom={10} scrollWheelZoom className="rounded">
         <TileLayer
