@@ -92,5 +92,5 @@ export default function RegionHealth() {
         );
       })}
     </div>
-  );
+  
 
