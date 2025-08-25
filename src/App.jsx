@@ -27,6 +27,9 @@ export default function App() {
 
               
               <RegionHealth />
+               <div className="p-4">
+                 <RegionHealth />
+               </div>
             </div>
           )}
 
