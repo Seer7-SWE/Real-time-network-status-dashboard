@@ -1,65 +1,96 @@
+// src/components/Analytics.jsx
+import { useMemo } from "react";
 import { useEvents } from "../utils/eventBus.jsx";
 import { useFilters } from "../utils/filterContext.jsx";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  BarChart, Bar
+  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid
 } from "recharts";
 
 export default function Analytics() {
-  const { events } = useEvents();
+  const { incidents, REGIONS, getRegionDayBuckets, calcMTTRMinutes, calcUptimePercent } = useEvents();
   const { region, severity, type } = useFilters();
 
-  // group by date
-  const history = events.reduce((acc, e) => {
-    const date = new Date(e.time).toISOString().slice(0, 10);
-    if (!acc[date]) acc[date] = { date, outages: 0, severe: 0 };
-    acc[date].outages++;
-    if (e.severity === "high") acc[date].severe++;
-    return acc;
-  }, {});
-  const chartData = Object.values(history);
-
-  
-  const filteredEvents = events.filter((a) => {
-    return (
-      (region ? a.region === region : true) &&
-      (severity ? a.severity === severity : true) &&
-      ( type ? a.type === type : true)
+  // Filter incidents (global filters)
+  const data = useMemo(() => {
+    return incidents.filter((i) =>
+      (region ? i.region === region : true) &&
+      (severity ? i.severity === severity : true) &&
+      (type ? i.type === type : true)
     );
-  });
+  }, [incidents, region, severity, type]);
+
+  // Region-wise trends: counts per region (active+resolved)
+  const regionCounts = useMemo(() => {
+    const map = new Map();
+    REGIONS.forEach((r) => map.set(r, { region: r, incidents: 0, high: 0, medium: 0, low: 0 }));
+    data.forEach((i) => {
+      const row = map.get(i.region);
+      row.incidents += 1;
+      row[i.severity] += 1;
+    });
+    return Array.from(map.values());
+  }, [data, REGIONS]);
+
+  // Comparative MTTR + Uptime per region
+  const regionPerf = useMemo(() => {
+    return REGIONS.map((r) => ({
+      region: r,
+      mttr: calcMTTRMinutes(r),
+      uptime: Number(calcUptimePercent(r))
+    }));
+  }, [REGIONS, calcMTTRMinutes, calcUptimePercent]);
+
+  // Day buckets for current region (if selected) or all
+  const dayBuckets = useMemo(() => getRegionDayBuckets(region || ""), [getRegionDayBuckets, region]);
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold">Network Analytics</h2>
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded shadow p-4 dark:text-gray-100">
-          <h3 className="font-semibold mb-2">Outages Over Time</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="outages" stroke="#6366f1" />
-              <Line type="monotone" dataKey="severe" stroke="#ef4444" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <h3 className="font-semibold mb-2">Daily Outages</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="outages" fill="#6366f1" />
-              <Bar dataKey="severe" fill="#ef4444" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      <h2 className="text-xl font-bold">Analytics & Insights</h2>
+
+      {/* Region-wise Trend (Grouped Bars by severity) */}
+      <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+        <h3 className="font-semibold mb-2">Region-wise Trend (Incidents by Severity)</h3>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={regionCounts}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="region" />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="low" fill="#22c55e" />
+            <Bar dataKey="medium" fill="#f59e0b" />
+            <Bar dataKey="high" fill="#ef4444" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* MTTR & Uptime cards */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {regionPerf.map((r) => (
+          <div key={r.region} className="bg-white dark:bg-gray-800 rounded shadow p-4">
+            <div className="font-semibold">{r.region}</div>
+            <div className="text-sm">MTTR: <span className="font-medium">{r.mttr} min</span></div>
+            <div className="text-sm">Uptime (24h est.): <span className="font-medium">{r.uptime}%</span></div>
+          </div>
+        ))}
+      </div>
+
+      {/* Daily buckets for selected region (or all) */}
+      <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+        <h3 className="font-semibold mb-2">
+          Daily Buckets {region ? `— ${region}` : "(All Regions)"}
+        </h3>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={dayBuckets}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="started" fill="#6366f1" name="Incidents Started" />
+            <Bar dataKey="resolved" fill="#10b981" name="Resolved" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
