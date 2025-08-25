@@ -32,7 +32,7 @@ export default function Analytics() {
     <div className="space-y-6">
       <h2 className="text-xl font-bold">Network Analytics</h2>
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded shadow">
+        <div className="bg-white dark:bg-gray-800 rounded shadow p-4 dark:text-gray-100">
           <h3 className="font-semibold mb-2">Outages Over Time</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
