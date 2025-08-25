@@ -1,6 +1,6 @@
 // src/components/Alerts.jsx
 import { useEffect, useRef } from "react";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useFilters } from "../utils/filterContext.jsx";
 import { useEvents } from "../utils/eventBus.jsx";
 
