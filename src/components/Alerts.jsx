@@ -1,95 +1,62 @@
-import { useEvents } from "../utils/eventBus.jsx";
+// src/components/Alerts.jsx
 import { useFilters } from "../utils/filterContext.jsx";
+import { useEvents } from "../utils/eventBus.jsx";
 
 export default function Alerts() {
-  const { events } = useEvents();
-  const alerts = [...events].reverse(); // latest first
-  const { region, setRegion, severity, setSeverity, type, setType, resetFilters } = useFilters();
+  const { incidents } = useEvents();
+  const { region, severity, type } = useFilters();
 
-  const filteredAlerts = alerts.filter((a) => {
-    return (
-      (region ? a.region === region : true) &&
-      (severity ? a.severity === severity : true) &&
-      (type ? a.type === type : true)
-    );
-  });
-
-  const regions = [...new Set(events.map((e) => e.region))];
+  const filtered = incidents
+    .filter((i) =>
+      (region ? i.region === region : true) &&
+      (severity ? i.severity === severity : true) &&
+      (type ? i.type === type : true)
+    )
+    .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded shadow p-4 h-full flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded shadow p-3 h-full">
       <h2 className="font-semibold mb-2">Live Alerts</h2>
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-2 mb-3">
-        <select
-          value={region}
-          onChange={(e) => setRegion(e.target.value)}
-          className="border rounded px-2 py-1 text-sm-black:text-sm-white"
-        >
-          <option value="">All Regions</option>
-          {regions.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={severity}
-          onChange={(e) => setSeverity(e.target.value)}
-          className="border rounded px-2 py-1 text-sm-black:text-sm-white"
-        >
-          <option value="">All Severities</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          className="border rounded px-2 py-1 text-sm-black:text-sm-white"
-        >
-          <option value="">All Types</option>
-          <option value="outage">Outage</option>
-          <option value="congestion">Congestion</option>
-        </select>
-
-        <button
-          onClick={resetFilters}
-          className="ml-auto bg-gray-100 hover:bg-gray-200 text-sm px-3 py-1 rounded"
-        >
-          Reset
-        </button>
-      </div>
-
-      {/* Alerts List */}
-      <ul className="space-y-2 overflow-auto pr-1 flex-1">
-        {filteredAlerts.map((a) => (
-          <li key={a.id} className="border rounded p-2">
-            <div className="flex justify-between">
-              <span className="font-medium">{a.region}</span>
-              <span
-                className={`text-xs px-2 py-0.5 rounded ${
-                  a.severity === "high"
-                    ? "bg-red-100 text-red-700"
-                    : a.severity === "medium"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-green-100 text-green-700"
-                }`}
-              >
-                {a.severity}
-              </span>
-            </div>
-            <div className="text-sm capitalize">{a.type}</div>
-            <div className="text-xs text-gray-500">
-              {new Date(a.time).toLocaleString()}
-            </div>
-          </li>
-        ))}
-
-        {filteredAlerts.length === 0 && (
+      <ul className="space-y-2 max-h-[70vh] overflow-auto pr-1">
+        {filtered.map((a) => {
+          const durationMin = Math.max(
+            1,
+            Math.round(
+              ((new Date(a.resolvedAt || a.endsAt)) - new Date(a.startedAt)) / 60000
+            )
+          );
+          return (
+            <li key={a.id} className="border rounded p-2 dark:border-gray-700">
+              <div className="flex justify-between items-center">
+                <div className="font-medium">{a.region}</div>
+                <span className={`text-xs px-2 py-0.5 rounded ${
+                  a.severity === "high" ? "bg-red-100 text-red-700"
+                  : a.severity === "medium" ? "bg-yellow-100 text-yellow-700"
+                  : "bg-green-100 text-green-700"
+                }`}>
+                  {a.severity}
+                </span>
+              </div>
+              <div className="text-sm capitalize">{a.type} — {a.service}</div>
+              <div className="text-xs text-gray-500">
+                Started: {new Date(a.startedAt).toLocaleString()}
+                {a.resolvedAt ? ` • Resolved: ${new Date(a.resolvedAt).toLocaleString()}` : ""}
+                {` • Duration: ~${durationMin}m`}
+              </div>
+              <div className="text-xs">
+                Estimated impacted users: <span className="font-semibold">{a.impactEstimate.toLocaleString()}</span>
+              </div>
+              <div className="mt-1">
+                <span className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded ${
+                  a.status === "resolved" ? "bg-gray-200 text-gray-700" : "bg-blue-100 text-blue-700"
+                }`}>
+                  {a.status}
+                </span>
+              </div>
+            </li>
+          );
+        })}
+        {filtered.length === 0 && (
           <li className="text-sm text-gray-500">No alerts found.</li>
         )}
       </ul>
