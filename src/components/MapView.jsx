@@ -18,14 +18,19 @@ export default function MapView() {
   const { events } = useEvents();
 
   return (
-    <div id="map" className="h-[400px] md:h-[500px] w-full rounded shadow">
+    <div id="map" className="h-[400px] md:h-[500px] w-full rounded shadow bg-white dark:bg-gray-800 p-4">
       <h2 className="font-semibold mb-2">Live Network Map</h2>
-      <MapContainer center={[26.2285, 50.586]} zoom={10} scrollWheelZoom className="rounded">
+      <MapContainer
+        center={[26.2285, 50.586]}
+        zoom={10}
+        scrollWheelZoom
+        className="h-full rounded z-0"
+      >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/">OSM</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {events.map(e => (
+        {events.map((e) => (
           <Marker key={e.id} position={[e.lat, e.lng]}>
             <Popup>
               <div className="text-sm">
