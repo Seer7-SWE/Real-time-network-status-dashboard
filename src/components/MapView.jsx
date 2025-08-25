@@ -73,32 +73,45 @@ function MapOverlays({ events, mode }) {
     const existingLayers = [];
 
     // MARKERS mode: render markers individually
-    if (mode === "markers") {
-      events.forEach(evt => {
-        const latlng = regions[evt.region];
-        if (!latlng) return;
+   // DEFAULT MARKERS MODE
+if (mode === "markers") {
+  events.forEach(evt => {
+    const latlng = regions[evt.region];
+    if (!latlng) return;
 
-        const marker = L.marker(latlng)
-          .bindPopup(`<b>${evt.region}</b><br>Status: ${evt.type}<br>Severity: ${evt.severity}`)
-          .addTo(map);
-        existingLayers.push(marker);
-      });
-    }
+    const marker = L.marker(latlng)
+      .bindPopup(
+        `<b>${evt.region}</b><br/>
+        ${evt.type} — ${evt.service || "N/A"}<br/>
+        Severity: ${evt.severity}`
+      )
+      .addTo(map);
 
-    // CLUSTERING mode
-    if (mode === "clustering") {
-      const markerCluster = L.markerClusterGroup();
-      events.forEach(evt => {
-        const latlng = regions[evt.region];
-        if (!latlng) return;
-        const marker = L.marker(latlng).bindPopup(
-          `<b>${evt.region}</b><br>Status: ${evt.type}<br>Severity: ${evt.severity}`
-        );
-        markerCluster.addLayer(marker);
-      });
-      markerCluster.addTo(map);
-      existingLayers.push(markerCluster);
-    }
+    existingLayers.push(marker);
+  });
+}
+
+// CLUSTERING MODE
+if (mode === "clustering") {
+  const markerCluster = L.markerClusterGroup();
+  events.forEach(evt => {
+    const latlng = regions[evt.region];
+    if (!latlng) return;
+
+    const marker = L.marker(latlng)
+      .bindPopup(
+        `<b>${evt.region}</b><br/>
+        ${evt.type} — ${evt.service || "N/A"}<br/>
+        Severity: ${evt.severity}`
+      );
+
+    markerCluster.addLayer(marker);
+  });
+
+  markerCluster.addTo(map);
+  existingLayers.push(markerCluster);
+}
+
 
     // HEATMAP mode
     if (mode === "heatmap") {
