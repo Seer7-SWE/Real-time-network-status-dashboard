@@ -28,7 +28,6 @@ function getUptime(events, totalEvents) {
 
 export default function RegionHealth() {
   const { events } = useEvents();
-  const { region, severity, type } = useFilters();
   const { region, setRegion, severity, type } = useFilters();
 
   // Apply global filters (but ignore region filter — we show all regions)
