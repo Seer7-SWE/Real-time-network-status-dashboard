@@ -18,19 +18,25 @@ L.Marker.prototype.options.icon = DefaultIcon;
 export default function MapView() {
   const { events } = useEvents();
 
+  useEffect(() => {
+  const map = L.map("map").setView([26.2, 50.6], 11);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; OpenStreetMap contributors',
+  }).addTo(map);
+
+  // ---- Add clustering ----
   const markers = L.markerClusterGroup();
-
- events.forEach(evt => {
-  const latlng = regions[evt.region];
-  if (latlng) {
-    const marker = L.marker(latlng).bindPopup(
-      `<b>${evt.region}</b><br>Status: ${evt.type}<br>Severity: ${evt.severity}`
-    );
-    markers.addLayer(marker);
-  }
-});
-
-map.addLayer(markers);
+  events.forEach(evt => {
+    const latlng = regions[evt.region];
+    if (latlng) {
+      const marker = L.marker(latlng).bindPopup(
+        `<b>${evt.region}</b><br>Status: ${evt.type}<br>Severity: ${evt.severity}`
+      );
+      markers.addLayer(marker);
+    }
+  });
+  map.addLayer(markers);
 
 const regionPolygons = {
   "Manama": [
@@ -98,6 +104,21 @@ Object.entries(regionPolygons).forEach(([region, coords]) => {
     alert(`${region}: ${regionEvents.length} incidents\nLast: ${regionEvents.at(-1)?.type || "None"}`);
   });
 });
+
+    const heatPoints = events.map(evt => {
+    const latlng = regions[evt.region];
+    if (!latlng) return null;
+    let intensity = evt.severity === "high" ? 1 : evt.severity === "medium" ? 0.6 : 0.3;
+    return [latlng[0], latlng[1], intensity];
+  }).filter(Boolean);
+
+  L.heatLayer(heatPoints, { radius: 25, blur: 15 }).addTo(map);
+
+  return () => {
+    map.remove(); // cleanup
+  };
+}, [events]);
+
 
   return (
     <div id="map" className="h-[400px] md:h-[500px] w-full rounded shadow bg-white dark:bg-gray-800 p-4">
