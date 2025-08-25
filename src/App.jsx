@@ -6,6 +6,9 @@ import Analytics from "./components/Analytics.jsx";
 import RegionHealth from "./components/RegionHealth.jsx";
 import { EventProvider } from "./utils/eventBus.jsx";
 import { FilterProvider } from "./utils/filterContext.jsx";
+import Home from "./components/Home.jsx";
+import Login from "./components/Login.jsx";
+
 
 export default function App() {
   const [view, setView] = useState("dashboard");
