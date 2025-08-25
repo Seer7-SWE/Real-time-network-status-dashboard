@@ -69,11 +69,6 @@ export default function Alerts() {
 
         {/* Reset */}
         <button
-          onClick={() => {
-            setRegion("");
-            setSeverity("");
-            setType("");
-          }}
            onClick={resetFilters}
           className="ml-auto bg-gray-100 hover:bg-gray-200 text-sm px-3 py-1 rounded"
         >
