@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSession, logout as doLogout } from "../utils/auth.js"; // added below
+import { exportIncidentsCSV } from "../utils/export.js";
+import { useEvents } from "../utils/eventBus.jsx";
 
 export default function Navbar({ setView }) {
   const [dark, setDark] = useState(false);
   const session = useSession(); // { username, role } or null
+  const { incidents } = useEvents();
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -23,11 +26,13 @@ export default function Navbar({ setView }) {
     <nav className="bg-blue-600 dark:bg-blue-900 text-white p-4 flex justify-between items-center">
       <div className="flex items-center gap-3">
         <span className="text-xl font-bold">📡 Network Status</span>
-        {session && (
-          <span className="text-xs bg-white/20 px-2 py-0.5 rounded">
-            {session.role}
-          </span>
-        )}
+        {session && (session.role === "Admin" || session.role === "Engineer") && (
+           <button
+                    onClick={() => exportIncidentsCSV(incidents)}
+         className="ml-2 bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded">
+      Export CSV
+    </button>
+      )}
       </div>
 
       <div className="flex items-center gap-2">
