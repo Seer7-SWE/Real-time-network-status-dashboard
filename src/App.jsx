@@ -14,26 +14,23 @@ export default function App() {
     <EventProvider>
       <FilterProvider>
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-gray-100">
-          
           <Navbar setView={setView} />
 
-          
           {view === "dashboard" && (
-            
+            <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <MapView />
                 <Alerts />
               </div>
 
-              
               <RegionHealth />
-               <div className="p-4">
-                 <RegionHealth />
-               </div>
-            </div>
+
+              <div className="p-4">
+                <RegionHealth />
+              </div>
+            </>
           )}
 
-          
           {view === "analytics" && (
             <div className="p-4">
               <Analytics />
