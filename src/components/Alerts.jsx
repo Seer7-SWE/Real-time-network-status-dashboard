@@ -49,3 +49,50 @@ export default function Alerts() {
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
+          className="border rounded px-2 py-1 text-sm"
+        >
+          <option value="">All Types</option>
+          <option value="outage">Outage</option>
+          <option value="congestion">Congestion</option>
+        </select>
+
+        <button
+          onClick={resetFilters}
+          className="ml-auto bg-gray-100 hover:bg-gray-200 text-sm px-3 py-1 rounded"
+        >
+          Reset
+        </button>
+      </div>
+
+      {/* Alerts List */}
+      <ul className="space-y-2 overflow-auto pr-1 flex-1">
+        {filteredAlerts.map((a) => (
+          <li key={a.id} className="border rounded p-2">
+            <div className="flex justify-between">
+              <span className="font-medium">{a.region}</span>
+              <span
+                className={`text-xs px-2 py-0.5 rounded ${
+                  a.severity === "high"
+                    ? "bg-red-100 text-red-700"
+                    : a.severity === "medium"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-green-100 text-green-700"
+                }`}
+              >
+                {a.severity}
+              </span>
+            </div>
+            <div className="text-sm capitalize">{a.type}</div>
+            <div className="text-xs text-gray-500">
+              {new Date(a.time).toLocaleString()}
+            </div>
+          </li>
+        ))}
+
+        {filteredAlerts.length === 0 && (
+          <li className="text-sm text-gray-500">No alerts found.</li>
+        )}
+      </ul>
+    </div>
+  );
+}
