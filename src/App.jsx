@@ -13,7 +13,7 @@ export default function App() {
   return (
     <EventProvider>
       <FilterProvider>
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-gray-100"
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-gray-100">
           
           <Navbar setView={setView} />
 
