@@ -143,12 +143,12 @@ function metricsFor(sev) {
 }
 
 // when creating the marker:
-const m = metricsFor(inc.severity);
+const m = metricsFor(event.severity);
 marker.bindPopup(`
-  <b>${inc.region}</b><br/>
-  ${inc.type} — ${inc.service}<br/>
-  Severity: ${inc.severity} | Status: ${inc.status}<br/>
-  Latency: ${m.latency} ms • Packet Loss: ${m.loss.toFixed(1)}%<br/>
+  <b>${event.region}</b><br/>
+  ${event.type} — ${event.service}<br/>
+  Severity: ${event.severity} | Status: ${event.status}<br/>
+  Latency: ${event.latency} ms • Packet Loss: ${event.loss.toFixed(1)}%<br/>
   ${new Date(inc.startedAt).toLocaleString()}
 `);
 
