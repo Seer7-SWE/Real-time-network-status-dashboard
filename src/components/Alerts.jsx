@@ -7,6 +7,8 @@ import { useEvents } from "../utils/eventBus.jsx";
 export default function Alerts() {
   const { incidents } = useEvents();
   const { region, severity, type } = useFilters();
+  const seen = useRef(new Set());
+
 
   const filtered = incidents
     .filter((i) =>
@@ -15,6 +17,16 @@ export default function Alerts() {
       (type ? i.type === type : true)
     )
     .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+
+  useEffect(() => {
+    // toast on first sight of a high-severity active incident
+    incidents.forEach((i) => {
+      if (i.severity === "high" && i.status === "active" && !seen.current.has(i.id)) {
+        seen.current.add(i.id);
+        toast.error(`High ${i.type} in ${i.region} — ${i.service}`, { icon: "🚨" });
+      }
+    });
+  }, [incidents]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded shadow p-3 h-full">
