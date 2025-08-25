@@ -76,5 +76,11 @@ export default function Alerts() {
       </ul>
       <ToastContainer position="top-right" autoClose={4000} newestOnTop closeOnClick pauseOnHover />
     </div>
+    <div className="p-4 space-y-4">
+      <GlobalBanner />
+      <KpiCards />
+  
+   </div>
+
   );
 }
