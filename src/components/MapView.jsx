@@ -191,11 +191,7 @@ export default function MapView() {
         <MapOverlays events={events} mode={mode} />
       </MapContainer>
     </div>
-    <div className="p-4 space-y-4">
-     <GlobalBanner />
-     <KpiCards />
   
-    </div>
 
   );
 }
