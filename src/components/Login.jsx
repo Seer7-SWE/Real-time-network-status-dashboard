@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { login } from "../utils/auth.js";
+import { useSettings } from '../utils/settingsContext';
 
 export default function Login({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
