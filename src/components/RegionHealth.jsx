@@ -1,5 +1,6 @@
 import { useEvents } from "../utils/eventBus.jsx";
 import { useFilters } from "../utils/filterContext.jsx";
+import { useSettings } from '../utils/settingsContext';
 
 const regionsList = [
   "Manama",
