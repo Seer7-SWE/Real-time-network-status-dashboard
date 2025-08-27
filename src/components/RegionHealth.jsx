@@ -56,7 +56,7 @@ export default function RegionHealth() {
             onClick={() => setRegion(r)}
             onDoubleClick={() => setRegion(null)}
             className={`bg-white dark:bg-gray-800 rounded shadow p-4 flex flex-col cursor-pointer transition
-              ${region === r ? "ring-2 ring-blue-500" : "hover:bg-gray-50"}`}  title="Click to filter, double-click to clear"
+              ${region === r ? "ring-2 ring-blue-500" : "hover:bg-gray-50"}`}  
           >
             <h3 className="font-semibold text-lg mb-1">{r}</h3>
             <p className="text-sm mb-1">
