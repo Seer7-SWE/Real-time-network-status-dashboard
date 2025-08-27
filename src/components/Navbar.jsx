@@ -50,7 +50,7 @@ export default function Navbar({ setView }) {
         {canExport && (
           <>
             <button onClick={() => exportIncidentsCSV(incidents)} className="ml-2 bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded">Export CSV</button>
-            <button onClick={() => exportIncidentsPDF(incidents) console.log("Export PDF clicked", incidents)} className="ml-2 bg-rose-500 hover:bg-rose-600 text-white px-3 py-1 rounded">Export PDF</button>
+            <button onClick={() => exportIncidentsPDF(incidents)} className="ml-2 bg-rose-500 hover:bg-rose-600 text-white px-3 py-1 rounded">Export PDF</button>
           </>
         )}
         
