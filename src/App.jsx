@@ -13,7 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useEvents } from "./utils/eventBus.jsx";
 import { useSession } from "./utils/auth.js";
 import "./index.css";
-import { SettingsProvider } from './utils/settingsContext';
+
 
 // Global network status banner
 function GlobalBanner() {
@@ -71,7 +71,7 @@ export default function App() {
   return (
     <EventProvider>
       <FilterProvider>
-        <SettingsProvider>
+        
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-gray-100 flex flex-col font-sans">
           <Navbar setView={setView} />
 
@@ -109,7 +109,7 @@ export default function App() {
         </div>
 
         <ToastContainer position="top-right" autoClose={4000} newestOnTop closeOnClick pauseOnHover />
-          </SettingsProvider>
+         
       </FilterProvider>
     </EventProvider>
   );
