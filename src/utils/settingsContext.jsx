@@ -1,24 +1,32 @@
-import {createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useState } from 'react';
 
 const SettingsContext = createContext();
 
 export function SettingsProvider({ children }) {
-  const [showPopup, setShowPopup] = useState(true);
-  const [darkmode, setDarkMode] = useState(false);
+  const [settings, setSettings] = useState({
+    refreshInterval: 5000,
+    showNotifications: true,
+    theme: 'light'
+  });
 
-const value = useMemo(() => ({
-  showPopup,
-  setShowPopup,
-  darkMode,
-  setDarkMode,
-}), [showPopup, darkMode]);
+  const updateSettings = (newSettings) => {
+    setSettings(prev => ({ ...prev, ...newSettings }));
+  };
 
-return (
-  <SettingsContext.Provider value={value}>
-    {children}
-  </SettingsContext.Provider>
-);
-
-export function useSettings() {
-  return useContext(SettingsContext);
+  return (
+    <SettingsContext.Provider value={{ settings, updateSettings }}>
+      {children}
+    </SettingsContext.Provider>
+  );
 }
+
+// Fixed export - use default export or named export consistently
+export const useSettings = () => {
+  const context = useContext(SettingsContext);
+  if (!context) {
+    throw new Error('useSettings must be used within a SettingsProvider');
+  }
+  return context;
+};
+
+export default SettingsContext;
