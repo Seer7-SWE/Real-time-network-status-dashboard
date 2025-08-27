@@ -1,4 +1,4 @@
-import jsPDF from "jspdf";
+
 
 export function exportIncidentsCSV(incidents) {
   const headers = [
@@ -22,7 +22,6 @@ export function exportIncidentsCSV(incidents) {
 
 /* PDF export using jsPDF + autotable */
 import jsPDF from "jspdf";
-import "jspdf-autotable";
 
 export function exportIncidentsPDF(incidents) {
   if (!incidents || incidents.length === 0) {
