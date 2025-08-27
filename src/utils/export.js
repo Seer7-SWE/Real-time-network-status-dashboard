@@ -1,3 +1,6 @@
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
 export function exportIncidentsCSV(incidents) {
   const headers = [
     "id","region","service","type","severity","status","startedAt","resolvedAt","impactEstimate"
