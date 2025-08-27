@@ -5,6 +5,7 @@ import { useFilters } from "../utils/filterContext.jsx";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid
 } from "recharts";
+import { useSettings } from '../utils/settingsContext';
 
 export default function Analytics() {
   const { incidents, REGIONS, getRegionDayBuckets, calcMTTRMinutes, calcUptimePercent } = useEvents();
