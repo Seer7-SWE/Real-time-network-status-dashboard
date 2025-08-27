@@ -8,6 +8,7 @@ import "leaflet.markercluster";
 import L from "leaflet";
 import { useEffect, useState } from "react";
 import { useEvents } from "../utils/eventBus.jsx";
+import { useSettings } from '../utils/settingsContext';
 
 // Default icon fix for Vite/Leaflet
 const DefaultIcon = new L.Icon({
