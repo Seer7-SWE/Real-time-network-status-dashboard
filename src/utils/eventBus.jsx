@@ -1,5 +1,6 @@
 // src/utils/eventBus.jsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 const EventContext = createContext();
 
@@ -185,6 +186,15 @@ export function EventProvider({ children }) {
         });
       });
     }, 5000); // tick every 5s
+
+      if (!events.length) return;
+      const { showPopup } = useSettings.getState(); // or however you store toggle
+
+      const evt = events.at(-1);
+      if (evt && showPopup) {
+        toast.info(`${evt.region}: ${evt.type} (sev ${evt.severity})`, { autoClose: 5000 });
+      }
+      }, [events]);
 
     return () => {
       clearInterval(startTimer);
