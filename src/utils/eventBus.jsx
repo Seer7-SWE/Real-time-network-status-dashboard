@@ -200,7 +200,7 @@ export function EventProvider({ children }) {
       clearInterval(startTimer);
       clearInterval(tickTimer);
     };
-  }, []);
+  } []);
 
   // Derived metrics helpers (used by Analytics/RegionHealth)
   const getRegionDayBuckets = useMemo(() => {
