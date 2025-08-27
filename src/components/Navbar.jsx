@@ -3,6 +3,7 @@ import { useSession, logout as doLogout } from "../utils/auth.js"; // added belo
 import { exportIncidentsCSV, exportIncidentsPDF } from "../utils/export.js";
 import { useEvents } from "../utils/eventBus.jsx";
 const POPUP_KEY = "popupsEnabled";
+import { useSettings } from '../utils/settingsContext';
 
 export default function Navbar({ setView }) {
   const [dark, setDark] = useState(false);
