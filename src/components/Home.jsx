@@ -1,3 +1,5 @@
+import { useSettings } from '../utils/settingsContext';
+
 export default function Home({ onLoginClick }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-6 text-center">
