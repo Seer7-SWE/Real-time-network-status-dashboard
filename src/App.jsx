@@ -61,6 +61,7 @@ export default function App() {
   const [view, setView] = useState("dashboard");
   const [page, setPage] = useState("home");
   const session = useSession();
+  const readOnly = session?.role === "Viewer";
 
   if (page === "home") return <Home onLoginClick={() => setPage("login")} />;
   if (page === "login") return <Login onLoginSuccess={() => setPage("dashboard")} />;
@@ -74,13 +75,14 @@ export default function App() {
 
           {view === "dashboard" && (
             <>
-              {/* Optional: Global status banner */}
+              
               <div className="p-4">
                 <GlobalBanner />
               </div>
 
-              {/* Optional: KPI cards */}
-              <div className="p-4">
+              <MapView readOnly={readOnly} />
+              <RegionHealth readOnly={readOnly} />
+              <div className="p-4" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200/50 dark:border-gray-700/40">
                 <KpiCards />
               </div>
 

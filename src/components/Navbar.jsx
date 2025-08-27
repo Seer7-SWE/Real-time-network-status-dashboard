@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSession, logout as doLogout } from "../utils/auth.js"; // added below
-import { exportIncidentsCSV } from "../utils/export.js";
+import { exportIncidentsCSV, exportIncidentsPDF } from "../utils/export.js";
 import { useEvents } from "../utils/eventBus.jsx";
 const POPUP_KEY = "popupsEnabled";
 
@@ -9,6 +9,7 @@ export default function Navbar({ setView }) {
   const session = useSession(); // { username, role } or null
   const { incidents } = useEvents();
   const [popupsEnabled, setPopupsEnabled] = useState(true);
+  const canExport = session && (session.role === "Admin" || session.role === "Engineer");
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -38,18 +39,22 @@ export default function Navbar({ setView }) {
     <nav className="bg-blue-600 dark:bg-blue-900 text-white p-4 flex justify-between items-center">
       <div className="flex items-center gap-3">
         <span className="text-xl font-bold">📡 Network Status</span>
-        {session && (session.role === "Admin" || session.role === "Engineer") && (
-           <button
-                    onClick={() => exportIncidentsCSV(incidents)}
-         className="ml-2 bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded">
-      Export CSV
-    </button>
-      )}
+        {session && (session.role === "Admin" || session.role === "Engineer") && <span className="text-xs bg-white/20 px-2 py-0.5 rounded">{session.role}</span>}
+           
+      
       </div>
 
       <div className="flex items-center gap-2">
         <button onClick={() => setView?.("dashboard")} className="px-3 py-1 rounded hover:bg-white/10">Dashboard</button>
         <button onClick={() => setView?.("analytics")} className="px-3 py-1 rounded hover:bg-white/10">Analytics</button>
+        {canExport && (
+          <>
+            <button onClick={() => exportIncidentsCSV(incidents)} className="ml-2 bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded">Export CSV</button>
+            <button onClick={() => exportIncidentsPDF(incidents)} className="ml-2 bg-rose-500 hover:bg-rose-600 text-white px-3 py-1 rounded">Export PDF</button>
+          </>
+        )}
+        
+      
         <button onClick={toggleTheme} className="ml-2 bg-white text-blue-700 px-2 py-1 rounded">🌓</button>
         <button
           onClick={togglePopups}

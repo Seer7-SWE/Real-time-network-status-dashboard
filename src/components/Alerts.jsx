@@ -63,7 +63,7 @@ export default function Alerts() {
                 {` • Duration: ~${durationMin}m`}
               </div>
               <div className="text-xs">
-                Estimated impacted users: <span className="font-semibold">{a.impactEstimate.toLocaleString()}</span>
+                Estimated impacted users: <span className="font-semibold">{Number.isFinite(a.impactEstimate) ? a.impactEstimate.toLocaleString() : "—"}</span>
               </div>
               <div className="mt-1">
                 <span className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded ${
