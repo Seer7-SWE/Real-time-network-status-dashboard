@@ -35,7 +35,7 @@ function estimateImpact(region, severity) {
   const factor = severity === "high" ? 0.12 : severity === "medium" ? 0.06 : 0.02;
   // Add a little noise
   const noise = 1 + (Math.random() * 0.2 - 0.1);
-  return Math.max(1, Math.round(pop * factor * noise));
+  return Math.max(1, Math.round((pop || 50000) * factor * noise)) || 1;
 }
 
 /**
