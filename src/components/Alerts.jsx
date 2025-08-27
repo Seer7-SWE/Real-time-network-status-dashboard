@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useFilters } from "../utils/filterContext.jsx";
 import { useEvents } from "../utils/eventBus.jsx";
+const POPUP_KEY = "popupsEnabled";
 
 export default function Alerts() {
   const { incidents } = useEvents();
@@ -20,10 +21,14 @@ export default function Alerts() {
 
   useEffect(() => {
     // toast on first sight of a high-severity active incident
+    const popupsEnabled = (localStorage.getItem(POPUP_KEY) ?? "true") === "true";
     incidents.forEach((i) => {
       if (i.severity === "high" && i.status === "active" && !seen.current.has(i.id)) {
         seen.current.add(i.id);
         toast.error(`High ${i.type} in ${i.region} — ${i.service}`, { icon: "🚨" });
+        if (popupsEnabled) {
+          toast.error(`High ${i.type} in ${i.region} — ${i.service}`, { icon: "🚨" });
+        }
       }
     });
   }, [incidents]);
