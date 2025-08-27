@@ -1,5 +1,6 @@
 // src/utils/eventBus.jsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useSettings } from "./settingsContext.jsx";
 import { toast } from "react-toastify";
 
 const EventContext = createContext();
@@ -165,8 +166,7 @@ export function EventProvider({ children }) {
   useEffect(() => {
     if (!events.length) return;
 
-    // Note: You need to define or import useSettings appropriately
-    const { showPopup } = useSettings?.getState?.() || {};
+    const { showPopup } = useSettings() || {};
     const evt = events.at(-1);
 
     if (evt && showPopup) {
