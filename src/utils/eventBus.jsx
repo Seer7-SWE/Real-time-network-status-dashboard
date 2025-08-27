@@ -6,7 +6,7 @@ const EventContext = createContext();
 
 /** Region meta for coords + population (for customer impact demo) */
 const REGION_META = {
-  "Manama":   { lat: 26.2285, lng: 50.5860, population: "200,000" },
+  "Manama": { lat: 26.2285, lng: 50.5860, population: "200,000" },
   "Al Muharraq": { lat: 26.2572, lng: 50.6119, population: "175,000" },
   "Riffa": { lat: 26.1278, lng: 50.5620, population: "350,000" },
   "Isa Town": { lat: 26.1736, lng: 50.5478, population: "45,000" },
@@ -17,8 +17,6 @@ const REGION_META = {
   "Al Hidd": { lat: 26.2455, lng: 50.65417, population: "45,000" },
   "Budaiya": { lat: 26.2241, lng: 50.47083, population: "25,000" },
   "Al Zallaq": { lat: 26.0461, lng: 50.5072, population: "15,000" }
-
-
 };
 
 const REGIONS = Object.keys(REGION_META);
@@ -26,41 +24,22 @@ const SERVICES = ["Mobile Data", "Voice Calls", "SMS"];
 const TYPES = ["outage", "congestion"];
 const SEVERITIES = ["low", "medium", "high"];
 
-/** Helper: random pick */
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const randBetween = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-/** Estimate impacted users based on region population + severity */
 function estimateImpact(region, severity) {
-  const pop = REGION_META[region]?.population ?? 50_000;
+  const pop = parseInt(REGION_META[region]?.population.replace(/,/g, "") ?? 50000, 10);
   const factor = severity === "high" ? 0.12 : severity === "medium" ? 0.06 : 0.02;
-  // Add a little noise
   const noise = 1 + (Math.random() * 0.2 - 0.1);
-  return Math.max(1, Math.round((pop || 50000) * factor * noise)) || 1;
+  return Math.max(1, Math.round(pop * factor * noise)) || 1;
 }
 
-/**
- * Incident model:
- * {
- *   id, region, lat, lng, service, type, severity,
- *   status: 'active'|'resolved',
- *   startedAt, endsAt (planned), resolvedAt (actual),
- *   escalations: [{ at, from, to }]
- *   impactEstimate: number
- * }
- *
- * We also emit “events” (lightweight snapshots for map/alerts):
- * { id, region, lat, lng, type, severity, time, service, status }
- */
 export function EventProvider({ children }) {
-  const [events, setEvents] = useState([]);       // streaming updates for UI
-  const [incidents, setIncidents] = useState([]); // lifecycle objects
+  const [events, setEvents] = useState([]);
+  const [incidents, setIncidents] = useState([]);
 
-  // Start + manage simulated incidents
   useEffect(() => {
-    // Start a new incident periodically
     const startTimer = setInterval(() => {
-      // 60% chance to start a new incident tick
       if (Math.random() < 0.6) {
         const region = pick(REGIONS);
         const meta = REGION_META[region];
@@ -68,8 +47,6 @@ export function EventProvider({ children }) {
         const type = pick(TYPES);
         const severity = pick(SEVERITIES);
         const now = new Date();
-
-        // duration 10–30 minutes
         const minutes = randBetween(10, 30);
         const endsAt = new Date(now.getTime() + minutes * 60 * 1000);
 
@@ -90,7 +67,6 @@ export function EventProvider({ children }) {
         };
 
         setIncidents((prev) => [...prev, incident]);
-        // also push an initial event for UI
         setEvents((prev) => [
           ...prev,
           {
@@ -106,26 +82,21 @@ export function EventProvider({ children }) {
           }
         ]);
       }
-    }, 7000); // attempt every 7s
+    }, 7000);
 
-    // Manage active incidents: escalate + resolve; also emit periodic heartbeat events
     const tickTimer = setInterval(() => {
       setIncidents((prev) => {
         const now = new Date();
         return prev.map((inc) => {
           if (inc.status === "resolved") return inc;
 
-          // random chance to escalate once during its lifetime
           if (Math.random() < 0.15 && inc.severity !== "high") {
             const from = inc.severity;
             const to = from === "low" ? "medium" : "high";
             inc.severity = to;
             inc.escalations.push({ at: now.toISOString(), from, to });
-
-            // update impact when severity changes
             inc.impactEstimate = estimateImpact(inc.region, inc.severity);
 
-            // emit escalation event
             setEvents((prevE) => [
               ...prevE,
               {
@@ -142,12 +113,10 @@ export function EventProvider({ children }) {
             ]);
           }
 
-          // resolve if time passed
           if (now >= new Date(inc.endsAt)) {
             inc.status = "resolved";
             inc.resolvedAt = now.toISOString();
 
-            // emit resolved event
             setEvents((prevE) => [
               ...prevE,
               {
@@ -163,7 +132,6 @@ export function EventProvider({ children }) {
               }
             ]);
           } else {
-            // heartbeat event to keep map/alerts fresh
             if (Math.random() < 0.5) {
               setEvents((prevE) => [
                 ...prevE,
@@ -185,24 +153,27 @@ export function EventProvider({ children }) {
           return { ...inc };
         });
       });
-    }, 5000); // tick every 5s
-
-      if (!events.length) return;
-      const { showPopup } = useSettings.getState(); // or however you store toggle
-
-      const evt = events.at(-1);
-      if (evt && showPopup) {
-        toast.info(`${evt.region}: ${evt.type} (sev ${evt.severity})`, { autoClose: 5000 });
-      }
-      }, [events]);
+    }, 5000);
 
     return () => {
       clearInterval(startTimer);
       clearInterval(tickTimer);
     };
-  } []);
+  }, []);
 
-  // Derived metrics helpers (used by Analytics/RegionHealth)
+  // Show toast on new event (if setting enabled)
+  useEffect(() => {
+    if (!events.length) return;
+
+    // Note: You need to define or import useSettings appropriately
+    const { showPopup } = useSettings?.getState?.() || {};
+    const evt = events.at(-1);
+
+    if (evt && showPopup) {
+      toast.info(`${evt.region}: ${evt.type} (sev ${evt.severity})`, { autoClose: 5000 });
+    }
+  }, [events]);
+
   const getRegionDayBuckets = useMemo(() => {
     return (region) => {
       const byDay = new Map();
@@ -231,7 +202,6 @@ export function EventProvider({ children }) {
   }, [incidents]);
 
   const calcUptimePercent = useMemo(() => {
-    // Using a simple proxy: treat time covered by active incidents vs total simulated window
     return (region) => {
       const now = Date.now();
       const windowStart = now - 24 * 60 * 60 * 1000; // last 24h window proxy
@@ -254,14 +224,11 @@ export function EventProvider({ children }) {
   return (
     <EventContext.Provider
       value={{
-        events,        // streaming map/alerts updates
-        incidents,     // lifecycle data
-        REGION_META,
-        REGIONS,
-        SERVICES,
-        getRegionDayBuckets,
-        calcMTTRMinutes,
-        calcUptimePercent
+        events,        // List of events
+        incidents,     // Active incidents
+        getRegionDayBuckets,  // Method to get region-based daily buckets
+        calcMTTRMinutes,     // Method to calculate MTTR (Mean Time To Resolve) in minutes
+        calcUptimePercent,   // Method to calculate uptime percentage
       }}
     >
       {children}
