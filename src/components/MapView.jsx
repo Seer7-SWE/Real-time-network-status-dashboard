@@ -140,19 +140,19 @@ export default function MapView() {
 
       <div className="mb-4 space-x-2">
         <button
-          className={`px-3 py-1 rounded ${mode === "markers" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+          className={`px-3 py-1 rounded transition ${mode === "markers" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"}`}
           onClick={() => setMode("markers")}
         >
           Markers
         </button>
         <button
-          className={`px-3 py-1 rounded ${mode === "clustering" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+          className={`px-3 py-1 rounded transition ${mode === "clustering" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"}`}
           onClick={() => setMode("clustering")}
         >
           Clustering
         </button>
         <button
-          className={`px-3 py-1 rounded ${mode === "heatmap" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+          className={`px-3 py-1 rounded transition ${mode === "heatmap" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"}`}
           onClick={() => setMode("heatmap")}
         >
           Heatmap
