@@ -20,11 +20,10 @@ export function SettingsProvider({ children }) {
   );
 }
 
-// Fixed export - use default export or named export consistently
 export const useSettings = () => {
   const context = useContext(SettingsContext);
   if (!context) {
-    throw new Error('useSettings must be used within a SettingsProvider');
+    throw new Error('useSettings must be used within a SettingsProvider. Wrap your app with <SettingsProvider> in main.jsx');
   }
   return context;
 };
