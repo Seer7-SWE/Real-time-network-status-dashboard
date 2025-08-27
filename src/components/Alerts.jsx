@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useFilters } from "../utils/filterContext.jsx";
 import { useEvents } from "../utils/eventBus.jsx";
+import { useSettings } from '../utils/settingsContext';
 const POPUP_KEY = "popupsEnabled";
 
 export default function Alerts() {
