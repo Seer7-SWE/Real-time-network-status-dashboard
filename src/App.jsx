@@ -12,6 +12,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEvents } from "./utils/eventBus.jsx";
 import { useSession } from "./utils/auth.js";
+import { SettingsProvider } from "./utils/settingsContext.jsx";
 import "./index.css";
 
 
