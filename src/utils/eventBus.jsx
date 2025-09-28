@@ -238,4 +238,14 @@ export function EventProvider({ children }) {
 
 export function useEvents() {
   return useContext(EventContext);
+   const ctx = useContext(EventContext);
+  if (!ctx) {
+    console.error("❌ useEvents() called outside of EventProvider");
+  }
+  return ctx;
+  const dtx = useSettings(settingsContext);
+  if (!dtx) {
+    console.error("❌ useSettings() called outside of SettingsProvider");
+  }
+  return dtx;
 }
