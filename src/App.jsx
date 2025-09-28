@@ -69,6 +69,7 @@ export default function App() {
   if (!session) return <Home onLoginClick={() => setPage("login")} />;
 
   return (
+  <SettingsProvider>
     <EventProvider>
       <FilterProvider>
         
@@ -112,5 +113,6 @@ export default function App() {
          
       </FilterProvider>
     </EventProvider>
+  </SettingsProvider>
   );
 }
