@@ -1,13 +1,21 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import { SettingsProvider } from './utils/settingsContext.jsx'
-import './index.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import "./index.css";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+// Providers
+import { EventProvider } from "./utils/eventBus.jsx";
+import { FilterProvider } from "./utils/filterContext.jsx";
+import { SettingsProvider } from "./utils/settingsContext.jsx";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <SettingsProvider>
-      <App />
+      <EventProvider>
+        <FilterProvider>
+          <App />
+        </FilterProvider>
+      </EventProvider>
     </SettingsProvider>
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);
