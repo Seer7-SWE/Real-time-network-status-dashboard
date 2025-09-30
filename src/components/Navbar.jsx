@@ -12,6 +12,19 @@ export default function Navbar({ setView }) {
   const [popupsEnabled, setPopupsEnabled] = useState(true);
   const canExport = session && (session.role === "Admin" || session.role === "Engineer");
 
+  const handleExportPDF = async () => {
+   try {
+     setExporting(true);
+     await exportIncidentsPDF(incidents);
+   } catch (e) {
+     console.error("Export PDF error:", e);
+     alert("Export failed — see console.");
+   } finally {
+     setExporting(false);
+   }
+  };
+  const handleExportCSV = () => exportIncidentsCSV(incidents);
+  
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     const isDark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -50,8 +63,8 @@ export default function Navbar({ setView }) {
         <button onClick={() => setView?.("analytics")} className="px-3 py-1 rounded hover:bg-white/10">Analytics</button>
         {canExport && (
           <>
-            <button onClick={() => exportIncidentsCSV(incidents)} className="ml-2 bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded">Export CSV</button>
-            <button onClick={() => exportIncidentsPDF(incidents)} className="ml-2 bg-rose-500 hover:bg-rose-600 text-white px-3 py-1 rounded">Export PDF</button>
+            <button onClick={() => {handleExportCSV}} className="ml-2 bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded">Export CSV</button>
+            <button onClick={() => {handleExportPDF}} className={`ml-2 ${exporting ? "bg-gray-400" : "bg-rose-500 hover:bg-rose-600"} text-white px-3 py-1 rounded`}>{exporting ? "Exporting..." : "Export PDF"}</button>
           </>
         )}
         
