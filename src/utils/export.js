@@ -22,35 +22,62 @@ export function exportIncidentsCSV(incidents) {
 
 /* PDF export using jsPDF + autotable */
 import jsPDF from "jspdf";
-
-export function exportIncidentsPDF(incidents) {
+export async function exportIncidentsPDF(incidents) {
   if (!incidents || incidents.length === 0) {
     alert("No incidents to export.");
     return;
   }
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
 
-  // Title
-  doc.setFontSize(14);
-  doc.text("Incident Report", 40, 50);
-  doc.setFontSize(10);
-  doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 66);
+  try {
+    // dynamic import - handles different module shapes & avoids build issues
+    const jspdfModule = await import("jspdf");
+    const autoTableModule = await import("jspdf-autotable"); // side-effect registers plugin
 
-  const headers = ["ID", "Region", "Service", "Type", "Severity", "Status", "Started", "Resolved", "Impact"];
-  const rows = incidents.map(i => [
-    i.id, i.region, i.service || "", i.type || "", i.severity || "",
-    i.status || "", i.startedAt ? new Date(i.startedAt).toLocaleString() : "", i.resolvedAt ? new Date(i.resolvedAt).toLocaleString() : "", String(i.impactEstimate ?? "")
-  ]);
+    const jsPDFClass = jspdfModule.default || jspdfModule.jsPDF || jspdfModule;
+    const doc = new jsPDFClass({ unit: "pt", format: "a4" });
 
-  doc.autoTable({
-    head: [headers],
-    body: rows,
-    startY: 90,
-    theme: "striped",
-    headStyles: { fillColor: [22, 78, 138], textColor: 255 },
-    styles: { fontSize: 9, cellPadding: 6 },
-    margin: { left: 40, right: 40 }
-  });
+    doc.setFontSize(14);
+    doc.text("Incident Report", 40, 50);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 66);
 
-  doc.save(`incident-report-${new Date().toISOString().slice(0,10)}.pdf`);
+    const head = [["ID","Region","Service","Type","Severity","Status","Started At","Resolved At","Impact"]];
+    const body = incidents.map(i => [
+      i.id ?? "",
+      i.region ?? "",
+      i.service ?? "",
+      i.type ?? "",
+      i.severity ?? "",
+      i.status ?? "",
+      i.startedAt ? new Date(i.startedAt).toLocaleString() : "",
+      i.resolvedAt ? new Date(i.resolvedAt).toLocaleString() : "",
+      i.impactEstimate != null ? String(i.impactEstimate) : ""
+    ]);
+
+    // autoTable call
+    doc.autoTable({
+      head,
+      body,
+      startY: 90,
+      theme: "striped",
+      headStyles: { fillColor: [22, 78, 138], textColor: 255 },
+      styles: { fontSize: 9, cellPadding: 6 },
+      margin: { left: 40, right: 40 },
+      didDrawPage: (data) => {
+        // page footer with page number
+        const page = doc.getNumberOfPages();
+        doc.setFontSize(8);
+        doc.text(`Page ${page}`, doc.internal.pageSize.getWidth() - 60, doc.internal.pageSize.getHeight() - 30);
+      }
+    });
+
+    // Save file (trigger download)
+    const filename = `incident-report-${new Date().toISOString().slice(0,10)}.pdf`;
+    doc.save(filename);
+  } catch (err) {
+    console.error("PDF export failed:", err);
+    // fallback to CSV with user notice
+    alert("PDF export failed — falling back to CSV. See console for details.");
+    exportIncidentsCSV(incidents);
+  }
 }
