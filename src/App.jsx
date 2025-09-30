@@ -4,15 +4,12 @@ import MapView from "./components/MapView.jsx";
 import Alerts from "./components/Alerts.jsx";
 import Analytics from "./components/Analytics.jsx";
 import RegionHealth from "./components/RegionHealth.jsx";
-import { EventProvider } from "./utils/eventBus.jsx";
-import { FilterProvider } from "./utils/filterContext.jsx";
 import Home from "./components/Home.jsx";
 import Login from "./components/Login.jsx";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEvents } from "./utils/eventBus.jsx";
 import { useSession } from "./utils/auth.js";
-import { SettingsProvider } from "./utils/settingsContext.jsx";
 import "./index.css";
 
 
@@ -70,50 +67,42 @@ export default function App() {
   if (!session) return <Home onLoginClick={() => setPage("login")} />;
 
   return (
-  <SettingsProvider>
-    <EventProvider>
-      <FilterProvider>
-        
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-gray-100 flex flex-col font-sans">
-          <Navbar setView={setView} />
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-gray-100 flex flex-col font-sans">
+      <Navbar setView={setView} />
 
-          {view === "dashboard" && (
-            <>
-              
-              <div className="p-4">
-                <GlobalBanner />
-              </div>
+      {view === "dashboard" && (
+        <>
+          
+          <div className="p-4">
+            <GlobalBanner />
+          </div>
 
-              <MapView readOnly={readOnly} />
-              <RegionHealth readOnly={readOnly} />
-              <div className="p-4" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200/50 dark:border-gray-700/40">
-                <KpiCards />
-              </div>
+          <MapView readOnly={readOnly} />
+          <RegionHealth readOnly={readOnly} />
+          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/40">
+            <KpiCards />
+          </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
-                <div className="relative z-10 overflow-hidden">
-                  <MapView />
-                </div>
-                <Alerts />
-              </div>
-
-              <div className="p-4 relative z-20">
-                <RegionHealth />
-              </div>
-            </>
-          )}
-
-          {view === "analytics" && (
-            <div className="p-4">
-              <Analytics />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
+            <div className="relative z-10 overflow-hidden">
+              <MapView />
             </div>
-          )}
-        </div>
+            <Alerts />
+          </div>
 
-        <ToastContainer position="top-right" autoClose={4000} newestOnTop closeOnClick pauseOnHover />
-         
-      </FilterProvider>
-    </EventProvider>
-  </SettingsProvider>
+          <div className="p-4 relative z-20">
+            <RegionHealth />
+          </div>
+        </>
+      )}
+
+      {view === "analytics" && (
+        <div className="p-4">
+          <Analytics />
+        </div>
+      )}
+
+      <ToastContainer position="top-right" autoClose={4000} newestOnTop closeOnClick pauseOnHover />
+    </div>
   );
 }

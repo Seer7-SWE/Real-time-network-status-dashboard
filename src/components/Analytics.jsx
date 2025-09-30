@@ -1,14 +1,13 @@
 // src/components/Analytics.jsx
 import { useMemo } from "react";
-import { useEvents } from "../utils/eventBus.jsx";
+import { useEvents, REGIONS } from "../utils/eventBus.jsx";
 import { useFilters } from "../utils/filterContext.jsx";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid
 } from "recharts";
-import { useSettings } from '../utils/settingsContext';
 
 export default function Analytics() {
-  const { incidents, REGIONS, getRegionDayBuckets, calcMTTRMinutes, calcUptimePercent } = useEvents();
+  const { incidents, getRegionDayBuckets, calcMTTRMinutes, calcUptimePercent } = useEvents();
   const { region, severity, type } = useFilters();
 
   // Filter incidents (global filters)
@@ -30,7 +29,7 @@ export default function Analytics() {
       row[i.severity] += 1;
     });
     return Array.from(map.values());
-  }, [data, REGIONS]);
+  }, [data]);
 
   // Comparative MTTR + Uptime per region
   const regionPerf = useMemo(() => {
@@ -39,7 +38,7 @@ export default function Analytics() {
       mttr: calcMTTRMinutes(r),
       uptime: Number(calcUptimePercent(r))
     }));
-  }, [REGIONS, calcMTTRMinutes, calcUptimePercent]);
+  }, [calcMTTRMinutes, calcUptimePercent]);
 
   // Day buckets for current region (if selected) or all
   const dayBuckets = useMemo(() => getRegionDayBuckets(region || ""), [getRegionDayBuckets, region]);
@@ -94,7 +93,5 @@ export default function Analytics() {
         </ResponsiveContainer>
       </div>
     </div>
-    
-
   );
 }
