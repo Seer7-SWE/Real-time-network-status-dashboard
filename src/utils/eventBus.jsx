@@ -20,7 +20,7 @@ const REGION_META = {
   "Al Zallaq": { lat: 26.0461, lng: 50.5072, population: "15,000" }
 };
 
-const REGIONS = Object.keys(REGION_META);
+export const REGIONS = Object.keys(REGION_META);
 const SERVICES = ["Mobile Data", "Voice Calls", "SMS"];
 const TYPES = ["outage", "congestion"];
 const SEVERITIES = ["low", "medium", "high"];
@@ -163,16 +163,17 @@ export function EventProvider({ children }) {
   }, []);
 
   // Show toast on new event (if setting enabled)
+  const { settings } = useSettings();
+  
   useEffect(() => {
     if (!events.length) return;
 
-    const { showPopup } = useSettings() || {};
     const evt = events.at(-1);
 
-    if (evt && showPopup) {
+    if (evt && settings?.showNotifications) {
       toast.info(`${evt.region}: ${evt.type} (sev ${evt.severity})`, { autoClose: 5000 });
     }
-  }, [events]);
+  }, [events, settings]);
 
   const getRegionDayBuckets = useMemo(() => {
     return (region) => {
@@ -237,15 +238,9 @@ export function EventProvider({ children }) {
 }
 
 export function useEvents() {
-  return useContext(EventContext);
-   const ctx = useContext(EventContext);
+  const ctx = useContext(EventContext);
   if (!ctx) {
-    console.error("❌ useEvents() called outside of EventProvider");
+    throw new Error("useEvents must be used within an EventProvider. Wrap your app with <EventProvider> in main.jsx");
   }
   return ctx;
-  const dtx = useSettings(settingsContext);
-  if (!dtx) {
-    console.error("❌ useSettings() called outside of SettingsProvider");
-  }
-  return dtx;
 }
