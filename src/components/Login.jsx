@@ -12,7 +12,7 @@ export default function Login({ onLoginSuccess }) {
     if (session) {
       onLoginSuccess(session);
     } else {
-      alert("Invalid credentials (try admin/password123, engineer/eng12345, viewer/view12345)");
+      alert("Invalid credentials");
     }
   };
 
@@ -31,3 +31,4 @@ export default function Login({ onLoginSuccess }) {
     </div>
   );
 }
+// (try admin/password123, engineer/eng12345, viewer/view12345)
