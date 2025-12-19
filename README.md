@@ -1,4 +1,4 @@
-# 📡 Real-Time Network Status Dashboard
+#  Real-Time Network Status Dashboard
 
 **Telecom Network Monitoring & Analytics Platform (Prototype)**
 
@@ -10,22 +10,22 @@
 * Username: `admin`
 * Password: `password123`
 
-📁 **Source Code:**
+ **Source Code:**
 [https://github.com/Seer7-SWE/Real-time-network-status-dashboard](https://github.com/Seer7-SWE/Real-time-network-status-dashboard)
 
 ---
 
-## 🧭 Overview
+##  Overview
 
 The **Real-Time Network Status Dashboard** is a telecom-focused monitoring and analytics platform designed to visualize network health, outages, congestion, and performance trends across multiple regions in real time.
 
 This project simulates how **Network Operations Centers (NOC)** and **telecom engineering teams** monitor infrastructure reliability, respond to incidents, and generate management-level reports — aligned with real-world workflows used by operators such as **Zain Bahrain, Omantel, Batelco, and regional telecom solution providers**.
 
-> ⚠️ Note: This is a **production-style prototype** built for demonstration, learning, and evaluation purposes. The architecture is intentionally designed so it can later be connected to real OSS/BSS, SNMP, or monitoring APIs.
+>  Note: This is a **production-style prototype** built for demonstration, learning, and evaluation purposes. The architecture is intentionally designed so it can later be connected to real OSS/BSS, SNMP, or monitoring APIs.
 
 ---
 
-## 🎯 Key Objectives
+##  Key Objectives
 
 * Simulate **real-time telecom network incidents** (outages, congestion).
 * Provide **visual and analytical insights** for engineers and decision-makers.
@@ -34,9 +34,9 @@ This project simulates how **Network Operations Centers (NOC)** and **telecom en
 
 ---
 
-## 🚀 Core Features
+##  Core Features
 
-### 🌍 Live Network Map (Leaflet.js)
+###  Live Network Map (Leaflet.js)
 
 * Interactive map of Bahrain regions.
 * **Severity-based visualization**:
@@ -53,7 +53,7 @@ This project simulates how **Network Operations Centers (NOC)** and **telecom en
 
 ---
 
-### 🚨 Real-Time Incident & Alert System
+###  Real-Time Incident & Alert System
 
 * Live incident feed with:
 
@@ -67,7 +67,7 @@ This project simulates how **Network Operations Centers (NOC)** and **telecom en
 
 ---
 
-### 📊 Analytics & Insights
+###  Analytics & Insights
 
 * Region-wise instability comparison (e.g., Manama vs Riffa).
 * Historical incident trends.
@@ -80,7 +80,7 @@ This project simulates how **Network Operations Centers (NOC)** and **telecom en
 
 ---
 
-### 🧩 Region Health Cards
+###  Region Health Cards
 
 * Per-region overview cards showing:
 
@@ -94,7 +94,7 @@ This project simulates how **Network Operations Centers (NOC)** and **telecom en
 
 ---
 
-### 📄 Export & Reporting
+###  Export & Reporting
 
 * **CSV export** of incident history.
 * **PDF export** for management-ready reports.
@@ -102,7 +102,7 @@ This project simulates how **Network Operations Centers (NOC)** and **telecom en
 
 ---
 
-### 🌗 Professional UI/UX
+###  Professional UI/UX
 
 * Clean, modern dashboard layout.
 * Light / Dark mode toggle.
@@ -111,7 +111,7 @@ This project simulates how **Network Operations Centers (NOC)** and **telecom en
 
 ---
 
-### 🔐 Authentication & Roles (Prototype)
+###  Authentication & Roles (Prototype)
 
 * Login system with role simulation:
 
@@ -123,7 +123,7 @@ This project simulates how **Network Operations Centers (NOC)** and **telecom en
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 ### Frontend
 
@@ -147,7 +147,7 @@ This project simulates how **Network Operations Centers (NOC)** and **telecom en
 
 ---
 
-## 🏗️ High-Level Architecture
+##  High-Level Architecture
 
 ```
 User Interface (React + Tailwind)
@@ -171,7 +171,7 @@ Map / Alerts / Analytics Modules
 
 ---
 
-## 🧪 Demo Credentials
+##  Demo Credentials
 
 ```
 Username: admin
@@ -180,7 +180,7 @@ Password: password123
 
 ---
 
-## 📌 Use Cases (Telecom-Relevant)
+##  Use Cases (Telecom-Relevant)
 
 * Network Operations Center (NOC) monitoring
 * Regional outage analysis
@@ -190,7 +190,7 @@ Password: password123
 
 ---
 
-## 🔮 Planned Enhancements
+##  Planned Enhancements
 
 * Integration with real monitoring APIs.
 * Full JWT-based authentication with token expiry.
@@ -201,7 +201,7 @@ Password: password123
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 Developed as a **telecom-aligned engineering project** with focus on:
 
